@@ -1,0 +1,11 @@
+apple
+apple
+banana
+banana
+banana
+cat
+cat
+cat
+dog
+dog
+
