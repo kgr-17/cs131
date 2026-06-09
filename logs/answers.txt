@@ -1,4 +1,0 @@
-T1: cd /home/ishigaki-cs6/cs131/ws1 && pwd
-T2: ls../data
-T5: ls -lS
-T6: size=1048576 bytes; owner=ishigaki-cs6; modified=Jun 3 10:01
