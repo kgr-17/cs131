@@ -2,13 +2,15 @@ Q1: git add notes.md && git commit -m "ws2: add task line"
 Q2: git log --oneline -3
 Q3: git log --oneline
 Q4: git revert --no-edit 7a3bd64
-Q5_1: git rm --cached bigdata.bin
-Q5_2: echo bigdata.bin >> .gitignore
-Q5_2: git add .gitignore
-Q5_3: git commit --amend --no-edit
-Q5_4: git push
+Q5: git rm --cached bigdata.bin && echo "bigdata.bin" >> .gitignore && git add .gitignore && git commit --amend --no-edit && git push && rm bigdata.bin
 Q6: git switch -c feature-summary
 Q7: git add summary.md && git commit -m "ws2: add summary.md"
 Q8: git diff main feature-summary
 Q9: git switch main && git merge feature-summary
 Q10: git branch -d feature-summary
+Q11: git merge conflict-branch        # conflict reported in summary.md
+Q12: git status                       # summary.md listed under "Unmerged paths"
+Q13: edited summary.md, removed the <<<<<<<, =======, >>>>>>> marker lines, saved
+Q14: git add summary.md && git commit
+Q15: git fetch origin && git log HEAD..origin/main --oneline   # empty: local main is ahead of origin
+Q16: git fetch only downloads the remote's new commits into your local copy of the remote branch without changing your working branch, whereas git pull fetches and then merges them into your current branch automatically.
