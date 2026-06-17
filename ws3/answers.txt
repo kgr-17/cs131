@@ -1,0 +1,23 @@
+Part A — I/O Redirection & Pipelines
+
+A1: ls -l > listing.txt && date >> listing.txt
+A2: ls /nonexistent_dir 2> errors.txt    # stderr is file descriptor 2
+A3: ls /nonexistent_dir /etc 1> output.txt 2> errors.txt
+A4: ls /nonexistent_dir /etc &> combined.txt
+A5: ls /nonexistent_dir 2>/dev/null    # terminal shows nothing: the only output was the error, which was discarded. /dev/null is a special file that throws away everything written to it.
+A6: sort fruits.txt | uniq
+A7: sort fruits.txt | uniq -c | sort -rn
+A8: grep -c ERROR server.log
+A9: grep ERROR server.log > errors_only.txt
+A10: grep -oE '^[A-Z]+' server.log | sort | uniq -c | sort -rn
+A11: grep -oE '"state":"[A-Z]+"' /data/yelp/yelp_academic_dataset_business.json | sort | uniq -c | sort -rn | head -5
+
+Part B — File Permissions
+
+B1: id    # uid = user ID (the individual account); gid = primary group ID. uid=1039(ishigaki-cs6) gid=1039(ishigaki-cs6) groups: ishigaki-cs6, video, docker, render
+B2: ls -l fruits.txt    # -rw-r-----  owner(rw-)=read+write, group(r--)=read only, other(---)=no access
+B3: umask    # 0002 -> new files get 666 & ~002 = 664 (-rw-rw-r--); verified with: touch umask_test.txt && ls -l umask_test.txt
+B4: chmod 000 secret.txt    # cat secret.txt -> "cat: secret.txt: Permission denied"
+B4: chmod u+rw secret.txt    # restore owner read+write with symbolic notation
+B5: chmod 640 fruits.txt    # octal value = 640 (owner rw, group r, other none)
+B6: find ~/cs131/ws3 -type f -user "$(whoami)" -perm -u+w
