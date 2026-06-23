@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS 131 - Midterm 1 Study Lab</title>
+<style>
+  :root{
+    --bg:#0a0e16; --bg2:#0d1322; --panel:#121a2b; --panel2:#162136;
+    --border:#243049; --border2:#2f3e5e;
+    --text:#dce3f0; --muted:#8a97b2; --dim:#5d6982;
+    --green:#3fd87a; --cyan:#54b9ff; --amber:#f0b53f; --magenta:#d97bff;
+    --red:#ff6b6b; --blue:#6c8cff;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 700px at 80% -10%,#16213b 0%,transparent 60%),
+               radial-gradient(900px 600px at -10% 110%,#1a1430 0%,transparent 55%),
+               var(--bg);
+    color:var(--text); font-family:var(--sans); line-height:1.55;
+    -webkit-font-smoothing:antialiased; min-height:100vh;
+  }
+  a{color:var(--cyan)}
+  code,.mono{font-family:var(--mono)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+
+  header.top{padding:26px 20px 8px;max-width:1080px;margin:0 auto}
+  .termbar{display:flex;align-items:center;gap:8px;background:var(--panel);
+    border:1px solid var(--border);border-bottom:none;border-radius:12px 12px 0 0;padding:10px 14px}
+  .dot{width:12px;height:12px;border-radius:50%}
+  .dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+  .termpath{margin-left:8px;color:var(--dim);font-family:var(--mono);font-size:13px}
+  .hero{background:linear-gradient(180deg,var(--panel) 0%,var(--bg2) 100%);
+    border:1px solid var(--border);border-radius:0 0 14px 14px;padding:22px 24px 24px;box-shadow:var(--shadow)}
+  .hero h1{margin:0;font-size:27px;letter-spacing:.3px}
+  .hero h1 .prompt{color:var(--green);font-family:var(--mono)}
+  .hero p.sub{margin:6px 0 0;color:var(--muted);font-size:14.5px}
+  .examrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:13px;background:var(--panel2);
+    border:1px solid var(--border2);border-radius:999px;padding:6px 13px;color:var(--text)}
+  .pill b{color:var(--cyan)}
+  .countdown{margin-left:auto;text-align:right;font-family:var(--mono)}
+  .countdown .num{font-size:26px;color:var(--amber);font-weight:700;line-height:1}
+  .countdown .lbl{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+
+  nav.tabs{position:sticky;top:0;z-index:50;background:rgba(10,14,22,.85);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--border);margin-top:18px}
+  .tabsinner{max-width:1080px;margin:0 auto;display:flex;gap:4px;padding:8px 14px;overflow-x:auto}
+  .tab{appearance:none;border:1px solid transparent;background:transparent;color:var(--muted);
+    font-family:var(--mono);font-size:13.5px;padding:9px 15px;border-radius:9px;cursor:pointer;
+    white-space:nowrap;transition:.15s;font-weight:600}
+  .tab:hover{color:var(--text);background:var(--panel)}
+  .tab.active{color:var(--bg);background:var(--green);box-shadow:0 4px 14px rgba(63,216,122,.3)}
+
+  section.view{display:none;animation:fade .25s ease}
+  section.view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  h2.vt{font-size:20px;margin:26px 0 4px;display:flex;align-items:center;gap:10px}
+  h2.vt .hash{color:var(--green);font-family:var(--mono)}
+  p.vlead{color:var(--muted);margin:0 0 18px;font-size:14.5px;max-width:680px}
+
+  .grid{display:grid;gap:14px}
+  .grid.cols2{grid-template-columns:repeat(2,1fr)}
+  .grid.cols3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:760px){.grid.cols2,.grid.cols3{grid-template-columns:1fr}}
+
+  .card{background:linear-gradient(180deg,var(--panel) 0%,var(--bg2) 100%);
+    border:1px solid var(--border);border-radius:14px;padding:18px 18px 16px;
+    transition:.18s;position:relative;overflow:hidden}
+  .card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .card .accent{position:absolute;top:0;left:0;height:3px;width:100%}
+  .card h3{margin:4px 0 6px;font-size:16px}
+  .card .ic{font-size:22px}
+  .card p{margin:0;color:var(--muted);font-size:13.5px}
+  .t-intro{--c:var(--cyan)} .t-basics{--c:var(--green)} .t-text{--c:var(--magenta)}
+  .t-perm{--c:var(--amber)} .t-env{--c:var(--blue)} .t-git{--c:var(--red)}
+  .accent{background:var(--c)}
+
+  .topicblock{margin-bottom:14px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--panel)}
+  .topichead{display:flex;align-items:center;gap:12px;padding:15px 18px;cursor:pointer;user-select:none;
+    background:linear-gradient(90deg,var(--panel2),var(--panel))}
+  .topichead:hover{background:var(--panel2)}
+  .topichead .badge{font-family:var(--mono);font-size:11px;color:var(--bg);background:var(--c,#888);
+    padding:3px 8px;border-radius:6px;font-weight:700;white-space:nowrap}
+  .topichead h3{margin:0;font-size:16.5px;flex:1}
+  .topichead .chev{color:var(--dim);transition:.2s;font-family:var(--mono)}
+  .topichead.open .chev{transform:rotate(90deg);color:var(--text)}
+  .topicbody{display:none;padding:6px 18px 18px;border-top:1px solid var(--border)}
+  .topicbody.open{display:block}
+  .ksub{font-size:13px;color:var(--c,#aaa);text-transform:uppercase;letter-spacing:.8px;font-weight:700;
+    margin:16px 0 8px;font-family:var(--mono)}
+  .krow{display:flex;gap:12px;padding:7px 0;border-bottom:1px dashed var(--border);font-size:14px}
+  .krow:last-child{border-bottom:none}
+  .krow .kk{flex:0 0 168px;font-family:var(--mono);color:var(--text)}
+  .krow .kk code{color:var(--amber)}
+  .krow .kv{flex:1;color:var(--muted)}
+  .krow .kv code{background:#0c1322;border:1px solid var(--border);padding:1px 5px;border-radius:5px;color:var(--cyan);font-size:13px}
+  .note{background:rgba(84,185,255,.08);border-left:3px solid var(--cyan);padding:9px 13px;border-radius:0 8px 8px 0;
+    margin:12px 0 4px;font-size:13.5px;color:var(--text)}
+  .note b{color:var(--cyan)}
+  .note.warn{background:rgba(240,181,63,.09);border-left:3px solid var(--amber)}
+  .note.warn b{color:var(--amber)}
+
+  .refsearch{display:flex;gap:10px;margin:4px 0 18px;flex-wrap:wrap}
+  .refsearch input{flex:1;min-width:220px;background:var(--panel);border:1px solid var(--border2);color:var(--text);
+    font-family:var(--mono);font-size:14px;padding:11px 14px;border-radius:10px;outline:none}
+  .refsearch input:focus{border-color:var(--green)}
+  .filterbtns{display:flex;gap:6px;flex-wrap:wrap}
+  .fbtn{background:var(--panel);border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);
+    font-size:12px;padding:7px 11px;border-radius:8px;cursor:pointer}
+  .fbtn.active,.fbtn:hover{color:var(--bg);background:var(--cyan);border-color:var(--cyan)}
+  .refcat h4{font-family:var(--mono);font-size:13px;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin:18px 0 6px}
+  table.ref{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.ref td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  table.ref tr:hover{background:var(--panel)}
+  table.ref .c1{width:160px;font-family:var(--mono);color:var(--amber);white-space:nowrap}
+  table.ref .c2{color:var(--muted)}
+  table.ref .c3{width:230px;font-family:var(--mono);color:var(--cyan);font-size:12.5px}
+
+  .quizwrap{max-width:720px;margin:0 auto}
+  .qstart{text-align:center;padding:30px 20px}
+  .qstart .big{font-size:46px}
+  .qstart h3{margin:10px 0 6px;font-size:22px}
+  .qstart p{color:var(--muted);margin:0 auto 18px;max-width:440px}
+  .qopts{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+  .chk{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--border2);
+    padding:8px 13px;border-radius:9px;font-size:13px;color:var(--muted);cursor:pointer;font-family:var(--mono)}
+  .chk input{accent-color:var(--green)}
+  .btn{appearance:none;border:none;cursor:pointer;font-family:var(--mono);font-weight:700;font-size:14.5px;
+    padding:12px 26px;border-radius:11px;background:var(--green);color:var(--bg);transition:.15s;box-shadow:0 6px 18px rgba(63,216,122,.28)}
+  .btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;border:1px solid var(--border2);color:var(--text);box-shadow:none}
+  .btn.cyan{background:var(--cyan);box-shadow:0 6px 18px rgba(84,185,255,.28)}
+
+  .qprog{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .qbar{flex:1;height:8px;background:var(--panel);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+  .qbar span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));width:0;transition:.3s}
+  .qscore{color:var(--green);font-weight:700}
+  .qcard{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--border);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+  .qtag{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:6px;
+    background:var(--panel2);border:1px solid var(--border2);color:var(--cyan);margin-bottom:12px}
+  .qtype{float:right;font-family:var(--mono);font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+  .qtext{font-size:17px;margin:0 0 16px;line-height:1.5}
+  .qtext code{background:#0c1322;border:1px solid var(--border);padding:2px 7px;border-radius:6px;color:var(--amber);font-size:15px}
+  .ans{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid var(--border2);border-radius:11px;
+    cursor:pointer;transition:.13s;background:var(--panel);font-size:14.5px}
+  .opt:hover{border-color:var(--cyan);background:var(--panel2)}
+  .opt .key{font-family:var(--mono);font-weight:700;color:var(--dim);flex:0 0 22px}
+  .opt.sel{border-color:var(--cyan);background:rgba(84,185,255,.1)}
+  .opt.correct{border-color:var(--green);background:rgba(63,216,122,.14)}
+  .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:var(--red);background:rgba(255,107,107,.12)}
+  .opt.wrong .key{color:var(--red)}
+  .opt.locked{cursor:default;pointer-events:none}
+  .opt code{font-family:var(--mono);color:var(--amber)}
+  .fillin{width:100%;background:#0c1322;border:1px solid var(--border2);color:var(--text);font-family:var(--mono);
+    font-size:15px;padding:13px 15px;border-radius:11px;outline:none}
+  .fillin:focus{border-color:var(--cyan)}
+  .feedback{margin-top:16px;padding:14px 16px;border-radius:12px;display:none;font-size:14px;line-height:1.55}
+  .feedback.show{display:block;animation:fade .2s}
+  .feedback.ok{background:rgba(63,216,122,.1);border:1px solid rgba(63,216,122,.4)}
+  .feedback.no{background:rgba(255,107,107,.09);border:1px solid rgba(255,107,107,.35)}
+  .feedback .verdict{font-weight:700;font-family:var(--mono);margin-bottom:4px}
+  .feedback.ok .verdict{color:var(--green)}
+  .feedback.no .verdict{color:var(--red)}
+  .feedback code{background:#0c1322;border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:var(--amber);font-family:var(--mono)}
+  .qnav{display:flex;gap:10px;margin-top:18px;justify-content:space-between}
+  .result{text-align:center;padding:20px}
+  .result .ring{font-size:54px;font-weight:800;font-family:var(--mono)}
+  .result h3{margin:6px 0}
+  .result .msg{color:var(--muted);margin-bottom:20px}
+  .breakdown{text-align:left;max-width:440px;margin:0 auto 22px}
+  .bd{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13.5px}
+  .bd .nm{flex:1;font-family:var(--mono)}
+  .bd .track{flex:0 0 120px;height:7px;background:var(--panel);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+  .bd .track span{display:block;height:100%;background:var(--green)}
+  .bd .pct{flex:0 0 50px;text-align:right;color:var(--muted);font-family:var(--mono)}
+
+  footer{max-width:1080px;margin:30px auto 0;padding:18px 20px;color:var(--dim);font-size:12.5px;text-align:center;
+    border-top:1px solid var(--border);font-family:var(--mono)}
+  ::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px}
+
+  /* Grep Lab */
+  .labgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:760px){.labgrid{grid-template-columns:1fr}}
+  .stepcard{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px 17px}
+  .stepcard .n{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;
+    background:var(--magenta);color:var(--bg);font-family:var(--mono);font-weight:800;font-size:14px;margin-bottom:8px}
+  .stepcard h4{margin:0 0 6px;font-size:15px}
+  .stepcard p{margin:0;color:var(--muted);font-size:13.5px}
+  .stepcard code{background:#0c1322;border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:var(--amber);font-family:var(--mono);font-size:12.5px}
+  .stepcard .ex{margin-top:9px;font-family:var(--mono);font-size:12.5px;color:var(--cyan);background:#0c1322;border:1px solid var(--border);border-radius:7px;padding:8px 10px}
+  .tester{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--border2);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .tester .tlabel{font-family:var(--mono);font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .gpat{display:flex;align-items:center;background:#0c1322;border:1px solid var(--border2);border-radius:11px;overflow:hidden}
+  .gpat .gp{font-family:var(--mono);color:var(--green);padding:0 4px 0 13px;font-size:15px;white-space:nowrap}
+  .gpat input{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:15px;padding:13px 13px 13px 4px;outline:none}
+  .gpat input::placeholder{color:var(--dim)}
+  .tester .toggles{display:flex;gap:8px;flex-wrap:wrap;margin:11px 0}
+  .tg{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;color:var(--muted);
+    background:var(--panel2);border:1px solid var(--border2);padding:6px 11px;border-radius:8px;cursor:pointer}
+  .tg input{accent-color:var(--green)}
+  .terr{color:var(--red);font-family:var(--mono);font-size:12.5px;min-height:16px;margin:2px 0 6px}
+  .lines{display:flex;flex-direction:column;gap:5px;font-family:var(--mono);font-size:13px}
+  .lrow{display:flex;align-items:center;gap:10px;padding:7px 11px;border-radius:8px;border:1px solid var(--border);background:#0b1120;transition:.12s}
+  .lrow.match{border-color:rgba(63,216,122,.5);background:rgba(63,216,122,.07)}
+  .lrow .flag{flex:0 0 20px;text-align:center;font-weight:700;color:var(--dim)}
+  .lrow.match .flag{color:var(--green)}
+  .lrow .txt{flex:1;white-space:pre-wrap;word-break:break-all}
+  .lrow mark{background:var(--amber);color:#1a1206;border-radius:3px;padding:0 1px;font-weight:700}
+  .tester .summ{margin-top:11px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+  .tester .summ b{color:var(--green)}
+  .editlines{width:100%;background:#0c1322;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);
+    font-size:12.5px;padding:10px;border-radius:9px;outline:none;resize:vertical;min-height:64px}
+  .drill{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:15px 16px;margin-bottom:12px}
+  .drill .dq{font-size:14.5px;margin:0 0 10px}
+  .drill .dq code{background:#0c1322;border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:var(--amber);font-family:var(--mono)}
+  .dlines{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+  .dline{display:flex;align-items:center;gap:10px;padding:8px 11px;border:1px solid var(--border2);border-radius:8px;
+    font-family:var(--mono);font-size:13px;cursor:pointer;background:#0b1120;transition:.12s}
+  .dline:hover{border-color:var(--cyan)}
+  .dline.picked{border-color:var(--cyan);background:rgba(84,185,255,.1)}
+  .dline.right{border-color:var(--green);background:rgba(63,216,122,.13)}
+  .dline.miss{border-color:var(--red);background:rgba(255,107,107,.12)}
+  .dline .box{width:17px;height:17px;border:1.5px solid var(--border2);border-radius:5px;flex:0 0 17px;
+    display:flex;align-items:center;justify-content:center;font-size:12px}
+  .dline.picked .box{border-color:var(--cyan);color:var(--cyan)}
+  .dline.right .box{border-color:var(--green);color:var(--green)}
+  .dfeedback{font-size:13px;font-family:var(--mono);display:none;margin-top:4px}
+  .dfeedback.show{display:block}
+  .matchgame{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mcol{display:flex;flex-direction:column;gap:8px}
+  .mcol .ch{font-family:var(--mono);font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:2px}
+  .mitem{padding:10px 12px;border:1px solid var(--border2);border-radius:9px;background:#0b1120;cursor:pointer;
+    font-size:13px;transition:.12s;display:flex;align-items:center;gap:8px}
+  .mitem.tok{font-family:var(--mono);color:var(--amber);justify-content:center;font-size:14px}
+  .mitem:hover{border-color:var(--cyan)}
+  .mitem.sel{border-color:var(--cyan);background:rgba(84,185,255,.12)}
+  .mitem.done{opacity:.45;pointer-events:none;border-color:var(--green)}
+  .mitem .badge2{font-family:var(--mono);font-size:10px;background:var(--green);color:var(--bg);border-radius:5px;padding:1px 5px}
+  .mitem.wrongflash{animation:shake .35s}
+  @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="termbar">
+    <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+    <span class="termpath">~/cs131/midterm1 - study-lab</span>
+  </div>
+  <div class="hero">
+    <h1><span class="prompt">$</span> CS 131 - Midterm 1 Study Lab</h1>
+    <p class="sub">Processing Big Data: Tools &amp; Techniques - Linux command line, redirection, regex, permissions, processes, environment &amp; Git</p>
+    <div class="examrow">
+      <span class="pill">Wed, June 24</span>
+      <span class="pill"><b>9:00-10:00 AM</b> (60 min)</span>
+      <span class="pill">Canvas + Lockdown Browser</span>
+      <span class="pill">Bring Student ID</span>
+      <span class="pill">1 cheat sheet (2-sided)</span>
+      <span class="countdown"><span class="num" id="cd">-</span><span class="lbl" id="cdlbl">days to exam</span></span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabsinner" id="tabs">
+    <button class="tab active" data-v="home">Overview</button>
+    <button class="tab" data-v="cheat">Cheat Sheets</button>
+    <button class="tab" data-v="greplab">Grep &amp; Regex Lab</button>
+    <button class="tab" data-v="ref">Command Reference</button>
+    <button class="tab" data-v="quiz">Practice Quiz</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <section class="view active" id="home">
+    <h2 class="vt"><span class="hash">#</span> What's on the exam</h2>
+    <p class="vlead">Coverage: worksheets <b>ws1-ws3</b>, lecture slides <b>#01-#05</b>, and Git basics. Question types: multiple-choice, true/false, fill-in-the-blank, matching, command questions ("what commands do this?" / "I did this, what happens?") and conceptual questions.</p>
+    <div class="grid cols3" id="topiccards"></div>
+
+    <h2 class="vt"><span class="hash">#</span> How to use this lab</h2>
+    <div class="grid cols2">
+      <div class="card"><div class="accent" style="--c:var(--cyan)"></div><div class="ic">[ ]</div><h3>Cheat Sheets</h3><p>Expandable summaries for each topic - the exact concepts and commands from your slides and worksheets. Build your one-page cheat sheet from these.</p></div>
+      <div class="card"><div class="accent" style="--c:var(--magenta)"></div><div class="ic">/.*/</div><h3>Grep &amp; Regex Lab</h3><p>The hard part, made interactive: a mental model, a live grep tester, predict-the-match drills, and a token matching game.</p></div>
+      <div class="card"><div class="accent" style="--c:var(--amber)"></div><div class="ic">#</div><h3>Command Reference</h3><p>Searchable tables of every command with key options and a real example. Filter by category to find things fast.</p></div>
+      <div class="card"><div class="accent" style="--c:var(--green)"></div><div class="ic">?</div><h3>Practice Quiz</h3><p>50+ questions modeled on the worksheets and sample questions, with instant feedback, explanations and a scored breakdown by topic.</p></div>
+    </div>
+
+    <h2 class="vt"><span class="hash">#</span> Exam-day reminders</h2>
+    <div class="note">All slides are available during the exam. If a command needs detailed options, the manual will be provided - but you should <b>know the options you actually used</b> (e.g. <code>ls -l</code>, <code>grep -E</code>). Practice the worksheet questions until you can solve similar ones in a few minutes.</div>
+    <div class="note warn">If a question seems unclear on the Canvas exam, <b>leave a short note</b> explaining why you think it's vague - there's a scratch-paper section for partial credit.</div>
+  </section>
+
+  <section class="view" id="cheat">
+    <h2 class="vt"><span class="hash">#</span> Concept Cheat Sheets</h2>
+    <p class="vlead">Click any topic to expand. Everything here maps directly to slides #01-#05, Git, and ws1-ws3.</p>
+    <div style="margin-bottom:12px"><button class="fbtn" id="expandAll">expand all</button></div>
+    <div id="cheatlist"></div>
+  </section>
+
+  <section class="view" id="greplab">
+    <h2 class="vt"><span class="hash">#</span> Grep &amp; Regex Lab</h2>
+    <p class="vlead">The part that trips most people up. Start with the mental model, experiment in the live tester, then drill with predict-the-matches and the matching game.</p>
+
+    <h2 class="vt" style="font-size:16px"><span class="hash">1 -</span> How grep actually reads a line</h2>
+    <div class="labgrid" id="grepsteps"></div>
+
+    <h2 class="vt" style="font-size:16px"><span class="hash">2 -</span> Regex token reference</h2>
+    <p class="vlead" style="margin-bottom:10px">These are the pieces you snap together. <code style="font-family:var(--mono);color:var(--amber)">grep -E</code> (extended) is assumed for <code style="font-family:var(--mono);color:var(--amber)">+ ? { } | ( )</code>.</p>
+    <div id="tokentable"></div>
+
+    <h2 class="vt" style="font-size:16px"><span class="hash">3 -</span> Live tester - type a regex, see what matches</h2>
+    <div class="tester">
+      <div class="tlabel">pattern</div>
+      <div class="gpat">
+        <span class="gp" id="gpPrefix">grep -E '</span>
+        <input id="patIn" placeholder="e.g. ^[hc]at" autocomplete="off" spellcheck="false">
+        <span class="gp">'</span>
+      </div>
+      <div class="toggles">
+        <label class="tg"><input type="checkbox" id="tgE" checked> -E (extended)</label>
+        <label class="tg"><input type="checkbox" id="tgI"> -i (ignore case)</label>
+        <label class="tg"><input type="checkbox" id="tgV"> -v (invert)</label>
+        <label class="tg"><input type="checkbox" id="tgC"> -c (count only)</label>
+      </div>
+      <div class="terr" id="patErr"></div>
+      <div class="tlabel">sample input (one record per line - edit freely)</div>
+      <textarea class="editlines" id="sampleIn" spellcheck="false"></textarea>
+      <div class="tlabel" style="margin-top:11px">grep output</div>
+      <div class="lines" id="outLines"></div>
+      <div class="summ" id="outSumm"></div>
+    </div>
+
+    <h2 class="vt" style="font-size:16px"><span class="hash">4 -</span> Predict the matches</h2>
+    <p class="vlead" style="margin-bottom:10px">Tick every line you think grep would print, then check. This is the exam's "I ran this - what happens?" format.</p>
+    <div id="drills"></div>
+
+    <h2 class="vt" style="font-size:16px"><span class="hash">5 -</span> Matching game - token to meaning</h2>
+    <p class="vlead" style="margin-bottom:10px">Click a token on the left, then its meaning on the right. Pairs lock in when correct.</p>
+    <div class="tester">
+      <div class="matchgame">
+        <div class="mcol" id="mLeft"><div class="ch">token</div></div>
+        <div class="mcol" id="mRight"><div class="ch">meaning</div></div>
+      </div>
+      <div class="summ" id="matchSumm" style="text-align:center;margin-top:14px"></div>
+      <div style="text-align:center;margin-top:8px"><button class="fbtn" id="matchReset">reset game</button></div>
+    </div>
+  </section>
+
+  <section class="view" id="ref">
+    <h2 class="vt"><span class="hash">#</span> Command Reference</h2>
+    <p class="vlead">Search by command, description, or option. The example column shows usage you've seen in the worksheets.</p>
+    <div class="refsearch"><input id="refq" placeholder="search: chmod, grep -i, redirect, branch..." autocomplete="off"></div>
+    <div class="filterbtns" id="reffilters"></div>
+    <div id="reftables" style="margin-top:14px"></div>
+  </section>
+
+  <section class="view" id="quiz">
+    <h2 class="vt"><span class="hash">#</span> Practice Quiz</h2>
+    <p class="vlead">Modeled on your worksheets and the sample questions in the review deck.</p>
+    <div class="quizwrap" id="quizwrap"></div>
+  </section>
+
+</div>
+
+<footer>built for cs131 midterm 1 - self-contained study lab - good luck</footer>
+
+<script>
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const fmt = s => esc(s).replace(/`([^`]+)`/g, (m,p)=>`<code>${p}</code>`);
+
+const TOPICS = [
+  {id:"intro", cls:"t-intro", badge:"Slide 01", ic:"NET", title:"Intro & Remote Tools",
+   blurb:"Big-data tools on remote Linux servers; Git & SSH.",
+   sections:[
+     {h:"Big picture", rows:[
+       ["Course goal","Use command-line tools to process big data on remote Linux servers"],
+       ["Remote server","A shared multi-user Linux box (the DGX server) - many users at once"],
+       ["Must-learn tools","`Git` (version control) and `SSH` (Secure Shell) to reach the server"],
+     ]},
+     {h:"SSH", rows:[
+       ["SSH","Secure Shell - encrypted login to run commands on a remote machine"],
+       ["Login","`ssh user@host` opens a remote shell session"],
+     ]},
+   ]},
+  {id:"basics", cls:"t-basics", badge:"Slide 02", ic:"DIR", title:"Linux Command Basics",
+   blurb:"Filesystem, paths, navigation, ls, file manipulation, wildcards.",
+   sections:[
+     {h:"Filesystem & paths", rows:[
+       ["Structure","Files form a hierarchical (tree) structure; the top is the root directory `/`"],
+       ["Absolute path","Starts from root `/` - e.g. `/home/me/cs131`"],
+       ["Relative path","Starts from the current working directory"],
+       [". (dot)","The current working directory"],
+       [".. (dot-dot)","The parent directory"],
+       ["~ (tilde)","Your home directory"],
+     ]},
+     {h:"Navigate & explore", rows:[
+       ["`pwd`","Print the current working directory"],
+       ["`cd`","Change directory (`cd ..` up, `cd ~` home, `cd -` previous)"],
+       ["`ls`","List directory contents"],
+       ["`file`","Report a file's type (not its contents)"],
+       ["`cat` / `less`","View file contents (`less` pages through)"],
+       ["`man cmd`","Open the manual for a command's options"],
+     ]},
+     {h:"ls options & reading -l", rows:[
+       ["`ls -l`","Long format: type+perms, links, owner, group, size, date, name"],
+       ["`-a`","Show all, including hidden (dot) files"],
+       ["`-h`","Human-readable sizes (K, M, G)"],
+       ["`-r` `-t` `-S`","Reverse order / sort by time / sort by size"],
+       ["Combine","`ls -alhr` = all + long + human + reversed (one command)"],
+     ]},
+     {h:"File manipulation", rows:[
+       ["`cp`","Copy files/dirs - `cp -r` to copy a directory + contents"],
+       ["`mv`","Move OR rename (`mv old new`)"],
+       ["`mkdir`","Make directories - `mkdir -p a/b/c` makes parents too"],
+       ["`rm`","Remove - `rm -r` recursive, `rm -i` prompt first. No undo!"],
+       ["`ln`","Create hard / symbolic (`-s`) links"],
+     ]},
+     {h:"Wildcards (globbing)", rows:[
+       ["`*`","Matches any number of characters"],
+       ["`?`","Matches exactly one character"],
+       ["`[abc]`","Matches any one character in the set"],
+       ["`[!abc]` / `[^abc]`","Matches any one character NOT in the set"],
+       ["`[0-9]` `[a-z]`","Character range"],
+       ["Examples","`Data?.csv` matches Data1.csv not Data10.csv - `a[0-9][0-9].txt` matches a05.txt"],
+     ]},
+   ]},
+  {id:"text", cls:"t-text", badge:"Slide 03", ic:"TXT", title:"Text, Redirection & Regex",
+   blurb:"vim, text tools, I/O redirection, file descriptors, pipes, expansions, quoting, regex.",
+   sections:[
+     {h:"vim text editor", rows:[
+       ["Why vi/vim","Always available, lightweight, fast - ideal on a remote server with no GUI"],
+       ["Insert mode","Press `i` to type; `Esc` returns to normal mode"],
+       ["Save / quit","`:w` save - `:q` quit - `:wq` save+quit - `:q!` quit without saving"],
+     ]},
+     {h:"Text-processing tools", rows:[
+       ["`cat`","Concatenate / print files"],
+       ["`sort`","Sort lines (`-n` numeric, `-r` reverse)"],
+       ["`uniq`","Omit/report repeated ADJACENT lines - usually `sort | uniq` (`-c` counts)"],
+       ["`grep`","Print lines matching a pattern"],
+       ["`wc`","Count lines/words/bytes (`-l` lines)"],
+       ["`head` / `tail`","First / last lines of a file (`-n N`)"],
+       ["`echo`","Print text or variables"],
+     ]},
+     {h:"I/O redirection", rows:[
+       ["`>`","Redirect stdout to a file (OVERWRITE)"],
+       ["`>>`","Redirect stdout to a file (APPEND)"],
+       ["`2>`","Redirect stderr to a file (`2>>` append)"],
+       ["`&>`","Redirect BOTH stdout and stderr to one file"],
+       ["`<`","Redirect stdin FROM a file"],
+       ["`/dev/null`","The 'bit bucket' - `2>/dev/null` throws errors away"],
+     ]},
+     {h:"File descriptors", rows:[
+       ["What","A process's numbered links to the outside world"],
+       ["0","Standard input (stdin) - read input"],
+       ["1","Standard output (stdout) - write results"],
+       ["2","Standard error (stderr) - report errors"],
+     ]},
+     {h:"Pipelines", rows:[
+       ["`|`","Send stdout of one command into stdin of the next"],
+       ["`>` vs `|`","`>` connects a command to a FILE; `|` connects a command to another COMMAND"],
+       ["Classic combo","`sort file | uniq -c | sort -nr` - count & rank duplicates"],
+     ]},
+     {h:"Expansions & quoting", rows:[
+       ["Pathname","Wildcards expand to filenames before the command runs"],
+       ["Arithmetic","`$((2+3))` gives 5"],
+       ["Brace","`{1..5}` gives 1 2 3 4 5 - `file{a,b}` gives filea fileb"],
+       ["Parameter","`$HOME`, `$variable_name` expand to a variable's value"],
+       ["Command subst.","`$(command)` or backticks - use a command's output as text"],
+       ["Double quotes","Special chars lose meaning EXCEPT `$`, backslash, and back-quote"],
+       ["Single quotes","Suppress ALL expansions - fully literal"],
+       ["Backslash","Escape a single character"],
+     ]},
+     {h:"Regular expressions (POSIX)", rows:[
+       ["`.`","Any single character - `.at` matches hat, cat, bat"],
+       ["`[hc]at`","Matches 'hat' and 'cat'"],
+       ["`[^b]at`","Any '_at' EXCEPT 'bat'"],
+       ["`^`","Anchor: start of line - `^[hc]at`"],
+       ["`$`","Anchor: end of line - `[hc]at$`"],
+       ["`[[:digit:]]`","POSIX class - classes MUST be inside brackets (`a[:digit:]b` is an error)"],
+       ["`grep -E`","Extended regex: alternation `a|b`, `+`, `{n}`, groups `( )`"],
+       ["`grep -i / -c / -n / -v`","ignore case / count / line numbers / invert match"],
+     ]},
+   ]},
+  {id:"perm", cls:"t-perm", badge:"Slide 04", ic:"SEC", title:"Permissions & Processes",
+   blurb:"id, chmod, umask, su/sudo, ownership, processes, jobs, signals.",
+   sections:[
+     {h:"Security commands", rows:[
+       ["`id`","Show your identity - uid, gid, and groups"],
+       ["`chmod`","Change a file's mode (permissions) - owner or superuser only"],
+       ["`umask`","Set DEFAULT permissions for new files"],
+       ["`su`","Substitute user - `su -` = login shell; no name = root; needs TARGET's password"],
+       ["`sudo`","Run one command as another user (usually root); uses YOUR password; can be restricted"],
+       ["`chgrp`","Change a file's group ownership"],
+       ["`chown`","Change owner (and group) - needs superuser"],
+     ]},
+     {h:"Reading & setting permissions", rows:[
+       ["String","e.g. `-rw-r--r--` is type + owner(rwx) + group(rwx) + other(rwx)"],
+       ["First char","`-` file - `d` directory - `l` symbolic link"],
+       ["r / w / x","read=4 - write=2 - execute=1 (add them per section)"],
+       ["Octal 644","`rw-r--r--` (owner rw, group r, other r)"],
+       ["Octal 755","`rwxr-xr-x` - 600 = `rw-------` - 000 = no access"],
+       ["Symbolic","`chmod u+x f` - `chmod go-w f` - `chmod a=r f` (u/g/o/a, +/-/=)"],
+     ]},
+     {h:"umask", rows:[
+       ["Idea","Default base is 666 (files) / 777 (dirs); umask bits are removed"],
+       ["`umask 022`","New files become 644, new dirs become 755"],
+     ]},
+     {h:"Processes", rows:[
+       ["Process","An instance of a running program; each gets a PID"],
+       ["`init` / PID 1","First process at boot; a daemon that runs until shutdown"],
+       ["Parent / child","One process can launch (fork) another"],
+       ["`ps`","List running processes (`ps -p PID`, `ps aux`)"],
+       ["`top`","Live, updating view of tasks"],
+       ["`jobs`","List this shell's jobs (job #, status, command)"],
+     ]},
+     {h:"Background jobs", rows:[
+       ["`command &`","Launch immediately in the background"],
+       ["`fg %1`","Bring job 1 to the foreground"],
+       ["`Ctrl-Z`","Suspend (stop) the foreground job"],
+       ["`bg %1`","Resume a suspended job in the background"],
+       ["`disown`","Detach a job so it survives the terminal closing"],
+     ]},
+     {h:"Signals", rows:[
+       ["`kill`","Send a signal to a process (default = SIGTERM/15)"],
+       ["`kill %1` / `kill PID`","Target a job or a PID; `kill -9` = SIGKILL (force)"],
+       ["`Ctrl-C`","Sends SIGINT (interrupt) to the foreground program"],
+       ["SIGHUP","'Hang-up' sent when the terminal disconnects - normally kills the jobs"],
+       ["`shutdown`","Halt or reboot the system"],
+     ]},
+   ]},
+  {id:"env", cls:"t-env", badge:"Slide 05", ic:"ENV", title:"Environment & Utilities",
+   blurb:"Environment, startup files, cron, find, diff, curl.",
+   sections:[
+     {h:"The shell environment", rows:[
+       ["Environment","Session data: shell variables + environment variables"],
+       ["`printenv`","Print part or all of the environment"],
+       ["`export`","Send a variable to programs the shell launches (child processes)"],
+       ["`alias`","Make a shortcut - e.g. `alias ll='ls -l'`"],
+     ]},
+     {h:"Startup files", rows:[
+       ["Login shell","Prompted for username/password (console / SSH). Reads `/etc/profile`, `~/.bash_profile`"],
+       ["Non-login shell","Opened from a GUI terminal. Reads `~/.bashrc`"],
+       ["Hidden files","Names starting with `.` - shown by `ls -a`, hidden from `ls`"],
+       ["Reload","`.bashrc` is read at session start; force a re-read with `source ~/.bashrc`"],
+     ]},
+     {h:"cron - scheduling", rows:[
+       ["Idea","Runs commands automatically on a schedule, driven by a crontab file"],
+       ["Edit","`crontab -e`"],
+       ["Format","`min hour day-of-month month day-of-week command` - `*` = every value"],
+       ["Example","`30 08 * * * echo \"Good Morning\"` runs at 8:30 AM every day"],
+     ]},
+     {h:"Utility commands", rows:[
+       ["`find`","Search for files: `find PATH -name '*.txt'`"],
+       ["find sizes","`-size` units: `c` bytes - `k` KB - `M` MB - `G` GB (e.g. `-size +1M`)"],
+       ["`diff`","Compare two files line by line: `diff FILE1 FILE2`"],
+       ["`curl`","Transfer data from a URL: `curl URL` - `curl -o file URL` to save"],
+       ["`printf`","Print formatted text (more control than echo)"],
+     ]},
+   ]},
+  {id:"git", cls:"t-git", badge:"Git", ic:"GIT", title:"Git Version Control",
+   blurb:"clone, commit, branch, merge, revert, conflicts, push/pull/fetch.",
+   sections:[
+     {h:"Everyday workflow", rows:[
+       ["`git clone URL`","Copy a remote repo locally (what another student runs to get your public repo)"],
+       ["`git status`","See changed/staged files"],
+       ["`git add f`","Stage a file (`git add .` = everything)"],
+       ["`git commit -m \"msg\"`","Record staged changes; `git commit -am` stages tracked + commits"],
+       ["`git log --oneline`","Compact one-line history (find short hashes)"],
+       ["`git push` / `git pull`","Upload commits / download + merge remote changes"],
+       ["`git fetch`","Download remote changes WITHOUT merging (pull = fetch + merge)"],
+     ]},
+     {h:"Branching & merging", rows:[
+       ["`git switch -c name`","Create AND switch to a new branch (or `git checkout -b name`)"],
+       ["`git switch main`","Switch branches"],
+       ["`git merge name`","Merge a branch into the current one"],
+       ["`git diff a b`","Show differences between branches/commits"],
+       ["`git branch -d name`","Delete a merged branch (`-D` force)"],
+     ]},
+     {h:"Fixing mistakes", rows:[
+       ["`git revert HASH`","Make a NEW commit that undoes a bad one - safe, keeps history"],
+       ["`git commit --amend`","Rewrite the last (un-pushed) commit"],
+       ["`git rm --cached f`","Stop tracking a file but keep it on disk (e.g. a huge data file)"],
+       ["`.gitignore`","List files Git should ignore - GitHub rejects files over 100 MB"],
+     ]},
+     {h:"Merge conflicts", rows:[
+       ["When","Two branches edit the SAME lines - Git can't auto-decide"],
+       ["Markers","`<<<<<<< HEAD` ... `=======` ... `>>>>>>> branch`"],
+       ["Resolve","Edit the file, delete all three marker lines, then `git add` + `git commit`"],
+       ["List conflicts","`git status` shows files in an unmerged state"],
+     ]},
+   ]},
+];
+
+const REF = [
+  {cat:"Navigation & Exploration", tags:["basics"], items:[
+    ["pwd","Print current working directory","pwd"],
+    ["cd","Change directory","cd ~/cs131 - cd .. - cd -"],
+    ["ls","List directory contents","ls -alhr"],
+    ["file","Report a file's type","file logs/app01.log"],
+    ["cat","Concatenate / view file","cat notes.txt"],
+    ["less","Page through a file","less big.log"],
+    ["man","Open a command's manual","man ls"],
+  ]},
+  {cat:"File Manipulation", tags:["basics"], items:[
+    ["cp","Copy files / directories","cp -r data backup"],
+    ["mv","Move or rename","mv readme.txt README.md"],
+    ["mkdir","Make directories","mkdir -p cs131/ws1/logs"],
+    ["rm","Remove files / dirs (no undo)","rm -ri backup/data"],
+    ["touch","Create empty file / update time","touch answers.txt"],
+    ["ln","Create links","ln -s target link"],
+  ]},
+  {cat:"Text Processing", tags:["text"], items:[
+    ["grep","Print lines matching a pattern","grep -i worth review.json"],
+    ["grep -E","Extended regex (alternation, +, {n})","grep -E 'Coffee|Cafe' biz.json"],
+    ["sort","Sort lines","sort -nr nums.txt"],
+    ["uniq","Omit/count adjacent duplicates","sort f | uniq -c"],
+    ["wc","Count lines/words/bytes","wc -l file"],
+    ["head / tail","First / last lines","tail -n 5 log.txt"],
+    ["echo","Print text/variables","echo \"$HOME\""],
+    ["printf","Formatted print","printf \"%s\\n\" hi"],
+  ]},
+  {cat:"Redirection & Pipes", tags:["text"], items:[
+    [">","stdout to file (overwrite)","ls -l > listing.txt"],
+    [">>","stdout to file (append)","date >> listing.txt"],
+    ["2>","stderr to file","ls /bad 2> errors.txt"],
+    ["&>","stdout + stderr to one file","ls /bad /etc &> all.txt"],
+    ["<","stdin from file","sort < names.txt"],
+    ["|","pipe stdout to next stdin","grep ERROR log | wc -l"],
+    ["2>/dev/null","discard error output","ls /bad 2>/dev/null"],
+  ]},
+  {cat:"Permissions & Security", tags:["perm"], items:[
+    ["id","Show uid, gid, groups","id"],
+    ["chmod","Change permissions (octal/symbolic)","chmod 640 fruits.txt"],
+    ["umask","Default permissions for new files","umask 022"],
+    ["chgrp","Change group ownership","chgrp staff file"],
+    ["chown","Change owner (superuser)","sudo chown me file"],
+    ["su","Substitute user (login shell with -)","su - - su root"],
+    ["sudo","Run a command as another user","sudo cat /etc/sudoers"],
+  ]},
+  {cat:"Processes & Jobs", tags:["perm"], items:[
+    ["ps","List running processes","ps -p 1234 - ps aux"],
+    ["top","Live task monitor","top"],
+    ["jobs","List this shell's jobs","jobs"],
+    ["&","Run command in background","bash long.sh > log.txt &"],
+    ["fg / bg","Foreground / background a job","fg %1 - bg %1"],
+    ["Ctrl-Z","Suspend foreground job","(keystroke)"],
+    ["kill","Send a signal to a process","kill %1 - kill -9 PID"],
+    ["disown","Detach job from terminal","disown %1"],
+    ["shutdown","Halt or reboot","shutdown -h now"],
+  ]},
+  {cat:"Environment & Utilities", tags:["env"], items:[
+    ["printenv","Print environment variables","printenv PATH"],
+    ["export","Export var to child processes","export EDITOR=vim"],
+    ["alias","Create a command shortcut","alias ll='ls -l'"],
+    ["source","Re-read a startup file","source ~/.bashrc"],
+    ["crontab","Edit/list scheduled jobs","crontab -e - crontab -l"],
+    ["find","Search for files","find . -size +1M -name '*.log'"],
+    ["diff","Compare two files","diff a.txt b.txt"],
+    ["curl","Transfer data from a URL","curl -o page.html URL"],
+  ]},
+  {cat:"Git", tags:["git"], items:[
+    ["git clone","Copy a remote repo","git clone https://github.com/you/cs131.git"],
+    ["git status","Show working-tree state","git status"],
+    ["git add","Stage changes","git add answers.txt"],
+    ["git commit","Record staged changes","git commit -m \"linux basics\""],
+    ["git log","Show history","git log --oneline"],
+    ["git push / pull","Upload / download+merge","git push - git pull"],
+    ["git fetch","Download without merging","git fetch origin"],
+    ["git switch -c","Create + switch branch","git switch -c feature"],
+    ["git merge","Merge a branch in","git merge feature"],
+    ["git diff","Show differences","git diff main feature"],
+    ["git revert","Undo a commit safely","git revert a1b2c3d"],
+    ["git rm --cached","Untrack but keep file","git rm --cached big.bin"],
+  ]},
+];
+
+const QUIZ = [
+  {t:"Linux Basics", ty:"mc", q:"Which symbol always refers to the current user's home directory?",
+   o:["`.`","`..`","`~`","`/`"], a:2, e:"`~` is home. `.` is the current directory, `..` is the parent, `/` is the root."},
+  {t:"Linux Basics", ty:"mc", q:"`..` in a path refers to:",
+   o:["The current directory","The parent directory","The root directory","Your home directory"], a:1, e:"`..` is the parent of the working directory; `.` is the working directory itself."},
+  {t:"Linux Basics", ty:"fill", q:"Type the command that prints the absolute path of the directory you're currently in.",
+   a:["pwd"], e:"`pwd` = print working directory."},
+  {t:"Linux Basics", ty:"mc", q:"An ABSOLUTE pathname always starts from:",
+   o:["The working directory","The home directory `~`","The root directory `/`","The parent directory `..`"], a:2, e:"Absolute paths begin at root `/`; relative paths begin at the current working directory."},
+  {t:"Linux Basics", ty:"fill", q:"Show ALL files (including hidden) in long format, human-readable sizes, reverse order - in one command.",
+   a:["ls -alhr","ls -lahr","ls -lhar","ls -ahlr","ls -alrh","ls -rahl","ls -hlar","ls -larh","ls -ralh","ls -rhla","ls -ahrl","ls -arhl","ls -hral","ls -hlra","ls -rlha","ls -rlah","ls -arlh","ls -lrah","ls -lrha","ls -halr","ls -harl","ls -rhal"], e:"Combine the flags: `-a` all, `-l` long, `-h` human-readable, `-r` reverse. Letter order doesn't matter, e.g. `ls -alhr`."},
+  {t:"Linux Basics", ty:"mc", q:"Which command copies the directory `data/` AND its contents into `backup/`?",
+   o:["`cp data backup`","`cp -r data backup`","`mv data backup`","`cp -i data backup`"], a:1, e:"Copying a directory needs the recursive flag `-r`. Plain `cp` won't copy a directory's contents."},
+  {t:"Linux Basics", ty:"mc", q:"The wildcard pattern `Data?.csv` matches:",
+   o:["`Data1.csv` and `Data10.csv`","`Data1.csv` but NOT `Data10.csv`","Only `Data.csv`","Any file containing 'Data'"], a:1, e:"`?` matches exactly ONE character, so `Data1.csv` matches but `Data10.csv` (two chars) does not."},
+  {t:"Linux Basics", ty:"mc", q:"`ls a[0-9][0-9].txt` lists files like:",
+   o:["`a5.txt`","`a12.txt`","`abc.txt`","`a123.txt`"], a:1, e:"`[0-9][0-9]` is exactly two digits, so `a12.txt` matches - but not `a5.txt` (one digit) or `a123.txt` (three)."},
+  {t:"Linux Basics", ty:"fill", q:"Write the wildcard pattern (in `logs/`) matching `BACKUP.` followed by exactly three digits.",
+   a:["BACKUP.[0-9][0-9][0-9]","logs/BACKUP.[0-9][0-9][0-9]","BACKUP.[[:digit:]][[:digit:]][[:digit:]]"], e:"Each `[0-9]` matches one digit, so three of them = exactly three digits: `BACKUP.[0-9][0-9][0-9]`."},
+  {t:"Linux Basics", ty:"mc", q:"Which command reports a file's TYPE rather than its contents?",
+   o:["`cat`","`ls`","`file`","`type`"], a:2, e:"`file logs/app01.log` reports the type; `cat` would dump the contents."},
+
+  {t:"Text & Redirection", ty:"mc", q:"Which file descriptor number is standard error?",
+   o:["0","1","2","3"], a:2, e:"0 = stdin, 1 = stdout, 2 = stderr."},
+  {t:"Text & Redirection", ty:"mc", q:"`ls /nope 2>/dev/null` will:",
+   o:["Print the error to the screen","Save the error to a file","Discard the error so nothing prints","Append the error to a log"], a:2, e:"`2>` redirects stderr and `/dev/null` discards it - the error is thrown away."},
+  {t:"Text & Redirection", ty:"fill", q:"Which single operator sends BOTH stdout and stderr to the same file? (just the operator)",
+   a:["&>","&>>"], e:"`&>` redirects stdout and stderr together, e.g. `ls /bad /etc &> combined.txt`."},
+  {t:"Text & Redirection", ty:"mc", q:"What is the difference between `>` and `|`?",
+   o:["No difference","`>` connects a command to a FILE; `|` connects a command to another COMMAND","`>` appends; `|` overwrites","`>` is for input; `|` is for output"], a:1, e:"`>` redirects output to a file; the pipe `|` feeds one command's output into another command's input."},
+  {t:"Text & Redirection", ty:"mc", q:"`>>` differs from `>` because it:",
+   o:["Overwrites the file","Appends to the file","Redirects stderr","Reads from the file"], a:1, e:"`>` overwrites; `>>` appends to the end of the file."},
+  {t:"Text & Redirection", ty:"tf", q:"True or False: Single quotes suppress ALL shell expansions.",
+   a:true, e:"True. Single quotes are fully literal. Double quotes keep `$`, backslash, and back-quote active."},
+  {t:"Text & Redirection", ty:"mc", q:"Inside DOUBLE quotes, which characters keep their special meaning?",
+   o:["None","`*` and `?`","`$`, backslash, and back-quote","Everything"], a:2, e:"Double quotes neutralize most special characters except `$` (expansion), backslash (escape), and back-quote (command substitution)."},
+  {t:"Text & Redirection", ty:"fill", q:"To remove duplicate lines, `uniq` needs its input to be ____ first (one word).",
+   a:["sorted","sort"], e:"`uniq` only collapses ADJACENT duplicates, so you normally `sort` first: `sort f | uniq`."},
+  {t:"Text & Redirection", ty:"mc", q:"`$(date)` is an example of:",
+   o:["Arithmetic expansion","Brace expansion","Command substitution","Parameter expansion"], a:2, e:"Command substitution `$( )` (or backticks) inserts a command's output."},
+  {t:"Text & Redirection", ty:"mc", q:"What does the pipeline `sort fruits.txt | uniq -c | sort -nr` produce?",
+   o:["A reversed file","Each unique line with its count, most frequent first","Only duplicate lines","An alphabetical list"], a:1, e:"`sort` groups duplicates, `uniq -c` counts each group, and `sort -nr` orders by that count, descending."},
+  {t:"Text & Redirection", ty:"fill", q:"Extract only the ERROR lines from server.log and save them to errors_only.txt (pipeline + redirect).",
+   a:["grep error server.log > errors_only.txt","grep -e error server.log > errors_only.txt","grep error < server.log > errors_only.txt","cat server.log | grep error > errors_only.txt"], e:"`grep ERROR server.log > errors_only.txt` filters matching lines and redirects them into the file."},
+
+  {t:"Regex & grep", ty:"mc", q:"The regex `[^b]at` matches:",
+   o:["Only 'bat'","Any 3-char string ending in 'at' EXCEPT 'bat'","Nothing","'b', 'a', or 't'"], a:1, e:"`[^b]` is any single character that is NOT 'b', so it matches hat/cat/rat but not bat."},
+  {t:"Regex & grep", ty:"mc", q:"In a regex, the anchor for the END of a line is:",
+   o:["`^`","`$`","`.`","`*`"], a:1, e:"`^` anchors the start of a line; `$` anchors the end. `[hc]at$` matches hat/cat only at line end."},
+  {t:"Regex & grep", ty:"fill", q:"Which grep option makes the match case-INSENSITIVE? (just the flag, e.g. -x)",
+   a:["-i"], e:"`grep -i worth` matches both 'Worth' and 'worth'."},
+  {t:"Regex & grep", ty:"fill", q:"Which grep option returns a COUNT of matching lines instead of the lines? (just the flag)",
+   a:["-c"], e:"`grep -c '\"state\":\"CA\"' business.json` counts matching records."},
+  {t:"Regex & grep", ty:"mc", q:"Which grep option INVERTS the match (prints non-matching lines)?",
+   o:["`-n`","`-v`","`-c`","`-i`"], a:1, e:"`-v` inverts. `-n` adds line numbers, `-c` counts, `-i` ignores case."},
+  {t:"Regex & grep", ty:"mc", q:"Why is `a[:digit:]b` an error?",
+   o:["digit isn't a real class","POSIX character classes must be inside brackets, i.e. `a[[:digit:]]b`","grep can't use classes","It needs `-E`"], a:1, e:"A class like `[:digit:]` must sit inside its own brackets, giving `[[:digit:]]`."},
+  {t:"Regex & grep", ty:"fill", q:"A file has rows like `111,222,333,444`. Write a grep command to print lines with 222 in the SECOND column.",
+   a:["grep -e '^[^,]*,222,'","grep '^[^,]*,222,'","grep -E '^[^,]+,222,'","grep -E '^[^,]*,222,'","grep -E '^[0-9]+,222,'","grep '^[^,]*,222,' file","grep -E '^[^,]+,222,' file"], e:"Anchor at line start, match the first field (no comma) then a comma, then `222,`: `grep -E '^[^,]+,222,' file`."},
+  {t:"Regex & grep", ty:"mc", q:"`grep -c '\"state\":\"CA\"' business.json` prints:",
+   o:["Every matching record","The number of matching lines","The line numbers","Only the matched text"], a:1, e:"`-c` returns a COUNT of matching lines, not the lines themselves."},
+  {t:"Regex & grep", ty:"mc", q:"Which option makes grep print matching lines WITH their line numbers?",
+   o:["`-c`","`-n`","`-o`","`-v`"], a:1, e:"`-n` prefixes each match with its line number. `-o` prints only the match, `-c` counts, `-v` inverts."},
+  {t:"Regex & grep", ty:"mc", q:"To print all business records that are NOT 'Restaurants', use:",
+   o:["`grep Restaurants`","`grep -v Restaurants`","`grep -c Restaurants`","`grep -i Restaurants`"], a:1, e:"`-v` inverts the match, printing every line that does NOT contain the pattern."},
+  {t:"Regex & grep", ty:"mc", q:"The pattern `[0-9]{3}-[0-9]{3}-[0-9]{4}` (with -E) matches:",
+   o:["A date","A US phone number like 408-924-1000","An email address","An IP address"], a:1, e:"`{n}` repeats the digit class exactly n times: 3-3-4 digits with dashes = NNN-NNN-NNNN."},
+  {t:"Regex & grep", ty:"mc", q:"Which single regex matches BOTH the field `4.5` and `5.0` after `\"stars\":`?",
+   o:["`\"stars\":4.5|5.0`","`\"stars\":(4\\.5|5\\.0)`","`\"stars\":[4-5]`","`\"stars\":4.5.0`"], a:1, e:"Group the alternation and escape the dot: `\"stars\":(4\\.5|5\\.0)`. An unescaped `.` would match any character."},
+  {t:"Regex & grep", ty:"mc", q:"`a[[:digit:]]b` matches:",
+   o:["Only 'ab'","'a0b', 'a1b', up to 'a9b'","'adigitb'","Nothing - it's an error"], a:1, e:"`[[:digit:]]` is one digit, so a + digit + b. Without the outer brackets it WOULD be an error."},
+  {t:"Regex & grep", ty:"mc", q:"`grep -E 'Coffee|Cafe'` prints lines that contain:",
+   o:["Both words","Either Coffee or Cafe","Only 'Coffee'","The literal text Coffee|Cafe"], a:1, e:"In extended regex `|` is alternation (OR). Plain grep would treat `|` as a literal character."},
+  {t:"Regex & grep", ty:"mc", q:"`^[^,]+,222,` is run on these lines. Which ONE does it match?",
+   o:["`222,111,000,999`","`111,222,333,444`","`555,666,222,888`","`aaa,bbb,222,ccc`"], a:1, e:"It anchors at the start, takes the first field with `[^,]+`, then requires `,222,` - putting 222 in the SECOND column. Only `111,222,...` qualifies."},
+  {t:"Regex & grep", ty:"mc", q:"`grep -oE '^[A-Z]+' server.log` extracts:",
+   o:["The whole line","The uppercase word at the start of each line (e.g. ERROR, INFO)","Only lowercase letters","The line numbers"], a:1, e:"`-o` prints only the matched part; `^[A-Z]+` grabs the run of capitals at line start - handy for tallying log levels."},
+  {t:"Regex & grep", ty:"fill", q:"Write a command to COUNT how many lines in review.json mention 'pizza', case-insensitively.",
+   a:["grep -ic pizza review.json","grep -ci pizza review.json","grep -i -c pizza review.json","grep -c -i pizza review.json","grep -ic pizza","grep -ci pizza"], e:"Combine `-i` (ignore case) and `-c` (count): `grep -ic pizza review.json`."},
+  {t:"Regex & grep", ty:"fill", q:"Which grep option prints ONLY the matched text instead of the whole line? (just the flag)",
+   a:["-o"], e:"`grep -o` (often `grep -oE`) prints only the part that matched - great for piping into sort/uniq."},
+
+  {t:"Permissions", ty:"mc", q:"The octal mode `644` corresponds to:",
+   o:["`rwxr-xr-x`","`rw-r--r--`","`rw-rw-r--`","`rwx------`"], a:1, e:"6=rw- (4+2), 4=r-- so owner rw, group r, other r = `rw-r--r--`."},
+  {t:"Permissions", ty:"fill", q:"Write the 3-digit octal mode for: owner read+write, group read only, others nothing.",
+   a:["640"], e:"owner rw=6, group r=4, other ---=0, so 640."},
+  {t:"Permissions", ty:"mc", q:"In `-rwxr-xr--`, what can members of the GROUP do?",
+   o:["Read, write, execute","Read and execute","Read only","Nothing"], a:1, e:"The middle triple `r-x` = read + execute (no write) for the group."},
+  {t:"Permissions", ty:"mc", q:"Which command changes a file's GROUP ownership?",
+   o:["`chmod`","`chown`","`chgrp`","`umask`"], a:2, e:"`chgrp` changes the group. `chown` can change owner (and group), `chmod` changes permission bits."},
+  {t:"Permissions", ty:"mc", q:"`sudo` authenticates using WHOSE password?",
+   o:["The root user's password","Your own password","No password","The target user's password"], a:1, e:"`sudo` uses YOUR password and can be restricted to specific commands. `su` requires the TARGET user's password."},
+  {t:"Permissions", ty:"tf", q:"True or False: `umask 022` results in new files having permissions 644.",
+   a:true, e:"True. Base 666 for files minus the 022 mask gives 644 (rw-r--r--)."},
+
+  {t:"Processes", ty:"mc", q:"Which process is always assigned PID 1?",
+   o:["bash","top","init","kernel"], a:2, e:"`init` is the first process started at boot (PID 1) and runs until shutdown."},
+  {t:"Processes", ty:"fill", q:"Which keystroke SUSPENDS the current foreground job? (e.g. Ctrl-X)",
+   a:["ctrl-z","ctrl z","ctrlz","^z","ctrl+z","c-z"], e:"Ctrl-Z suspends (stops) the foreground job; you can then resume it with `bg` or `fg`."},
+  {t:"Processes", ty:"mc", q:"After `Ctrl-Z`, running `bg %1` will:",
+   o:["Kill job 1","Resume job 1 in the background","Bring job 1 to the foreground","List all jobs"], a:1, e:"`bg %1` resumes the suspended job, now running in the background."},
+  {t:"Processes", ty:"mc", q:"`Ctrl-C` sends which signal to the foreground program?",
+   o:["SIGHUP","SIGINT (interrupt)","SIGKILL","SIGTERM"], a:1, e:"Ctrl-C sends SIGINT (interrupt). SIGHUP is sent when the terminal disconnects."},
+  {t:"Processes", ty:"tf", q:"True or False: when no signal is specified, `kill` sends SIGTERM by default.",
+   a:true, e:"True. Plain `kill PID` sends SIGTERM (15). `kill -9` sends SIGKILL to force termination."},
+  {t:"Processes", ty:"mc", q:"What does `disown` accomplish?",
+   o:["Kills the job immediately","Detaches the job from the terminal so it survives the terminal closing","Brings the job to the foreground","Changes the job's owner"], a:1, e:"`disown` detaches a job so SIGHUP (sent when the terminal closes) won't stop it - it keeps running."},
+  {t:"Processes", ty:"mc", q:"Which command lists the active jobs of the current shell?",
+   o:["`ps`","`top`","`jobs`","`id`"], a:2, e:"`jobs` lists this shell's jobs with job number, status, and command."},
+
+  {t:"Environment", ty:"mc", q:"The crontab entry `30 08 * * *` runs the command:",
+   o:["Every 30 minutes","At 8:30 AM every day","On the 8th at 30 past midnight","Every 8 hours"], a:1, e:"Fields are min hour day-of-month month day-of-week. `30 08 * * *` = 08:30 every day (`*` = every value)."},
+  {t:"Environment", ty:"fill", q:"Write the command to edit your personal crontab file.",
+   a:["crontab -e"], e:"`crontab -e` opens your crontab for editing."},
+  {t:"Environment", ty:"mc", q:"A non-login shell (a GUI terminal window) primarily reads which startup file?",
+   o:["`~/.bash_profile`","`/etc/profile`","`~/.bashrc`","`~/.ssh/config`"], a:2, e:"Non-login (GUI terminal) shells read `~/.bashrc`; login shells read `/etc/profile` and `~/.bash_profile`."},
+  {t:"Environment", ty:"fill", q:"After editing `~/.bashrc`, write a command to apply the changes WITHOUT closing the terminal.",
+   a:["source ~/.bashrc","source ~/.bash_profile",". ~/.bashrc","source ./.bashrc"], e:"`source ~/.bashrc` (or `. ~/.bashrc`) re-reads the file in the current session."},
+  {t:"Environment", ty:"mc", q:"In `find`, the size unit `M` means:",
+   o:["Minutes","Megabytes","Maximum","Metadata"], a:1, e:"find size units: c=bytes, k=KB, M=MB, G=GB. `find . -size +1M` finds files over 1 MB."},
+  {t:"Environment", ty:"mc", q:"Which command saves a web page to a file?",
+   o:["`curl URL`","`curl -o page.html URL`","`diff URL page.html`","`cat URL`"], a:1, e:"`curl -o file URL` writes the downloaded data to a file; plain `curl URL` prints to stdout."},
+
+  {t:"Git", ty:"mc", q:"Which command creates a new branch AND switches to it in one step?",
+   o:["`git branch name`","`git switch -c name`","`git merge name`","`git checkout name`"], a:1, e:"`git switch -c name` (equivalently `git checkout -b name`) creates and switches. `git branch name` only creates."},
+  {t:"Git", ty:"mc", q:"To safely undo a commit you already pushed (preserving history), use:",
+   o:["`git reset --hard`","`git revert HASH`","`git rm`","`git commit --amend`"], a:1, e:"`git revert` makes a NEW commit that reverses the bad one - safe for shared branches. reset/amend rewrite history."},
+  {t:"Git", ty:"fill", q:"Write the git command that downloads remote changes WITHOUT merging them.",
+   a:["git fetch","git fetch origin","git fetch origin main"], e:"`git fetch` downloads remote commits but doesn't merge. `git pull` = fetch + merge."},
+  {t:"Git", ty:"tf", q:"True or False: GitHub rejects any single file larger than 100 MB on push.",
+   a:true, e:"True. That's why you'd add a big file to `.gitignore` and use `git rm --cached` to remove it from the commit."},
+  {t:"Git", ty:"mc", q:"The conflict markers `<<<<<<<`, `=======`, `>>>>>>>` appear when:",
+   o:["You forget to commit","Two branches edit the same lines and Git can't auto-merge","You push a large file","You delete a branch"], a:1, e:"A merge conflict occurs when both branches change the same lines; you edit the file, delete the markers, then `git add` + `git commit`."},
+];
+/* ===== countdown ===== */
+(function(){
+  const exam=new Date(2026,5,24,9,0,0);
+  const days=Math.ceil((exam-new Date())/(1000*60*60*24));
+  const el=document.getElementById('cd'), lbl=document.getElementById('cdlbl');
+  if(days>1){el.textContent=days; lbl.textContent='days to exam';}
+  else if(days===1){el.textContent='1'; lbl.textContent='day to exam';}
+  else if(days===0){el.textContent='today'; el.style.fontSize='20px'; lbl.textContent='exam day!';}
+  else{el.textContent='done'; lbl.textContent='exam passed';}
+})();
+
+/* ===== home cards ===== */
+document.getElementById('topiccards').innerHTML = TOPICS.map(t=>`
+  <div class="card ${t.cls}" data-go="${t.id}" style="cursor:pointer">
+    <div class="accent"></div><div class="ic" style="font-family:var(--mono);color:var(--c);font-weight:700">${t.ic}</div>
+    <h3>${esc(t.title)}</h3><p>${esc(t.blurb)}</p>
+    <div style="margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--dim)">${t.badge}</div>
+  </div>`).join('');
+
+/* ===== cheat sheets ===== */
+document.getElementById('cheatlist').innerHTML = TOPICS.map((t,i)=>`
+  <div class="topicblock ${t.cls}">
+    <div class="topichead" data-acc="${i}">
+      <span class="badge">${t.badge}</span><span style="font-family:var(--mono);color:var(--c);font-weight:700">${t.ic}</span>
+      <h3>${esc(t.title)}</h3><span class="chev">&#9654;</span>
+    </div>
+    <div class="topicbody" id="tb${i}">
+      ${t.sections.map(s=>`<div class="ksub">${esc(s.h)}</div>
+        ${s.rows.map(r=>`<div class="krow"><div class="kk">${fmt(r[0])}</div><div class="kv">${fmt(r[1])}</div></div>`).join('')}`).join('')}
+    </div>
+  </div>`).join('');
+function toggleAcc(i,force){
+  const head=document.querySelector(`.topichead[data-acc="${i}"]`), body=document.getElementById('tb'+i);
+  const open = force!==undefined ? force : !body.classList.contains('open');
+  body.classList.toggle('open',open); head.classList.toggle('open',open);
+}
+document.querySelectorAll('.topichead').forEach(h=>h.addEventListener('click',()=>toggleAcc(+h.dataset.acc)));
+toggleAcc(0,true);
+let allOpen=false;
+document.getElementById('expandAll').addEventListener('click',e=>{
+  allOpen=!allOpen; TOPICS.forEach((_,i)=>toggleAcc(i,allOpen));
+  e.target.textContent = allOpen?'collapse all':'expand all';
+});
+
+/* ===== command reference ===== */
+const allTags=[["all","All"],["basics","Basics"],["text","Text/Redir"],["perm","Perms/Proc"],["env","Env/Util"],["git","Git"]];
+document.getElementById('reffilters').innerHTML = allTags.map((t,i)=>`<button class="fbtn ${i===0?'active':''}" data-tag="${t[0]}">${t[1]}</button>`).join('');
+function renderRef(){
+  const q=document.getElementById('refq').value.trim().toLowerCase();
+  const tag=document.querySelector('#reffilters .fbtn.active').dataset.tag;
+  let html='';
+  REF.forEach(cat=>{
+    if(tag!=='all' && !cat.tags.includes(tag)) return;
+    const rows=cat.items.filter(it=> !q || (it[0]+' '+it[1]+' '+it[2]).toLowerCase().includes(q));
+    if(!rows.length) return;
+    html+=`<div class="refcat"><h4>${esc(cat.cat)}</h4><table class="ref"><tbody>`+
+      rows.map(it=>`<tr><td class="c1">${esc(it[0])}</td><td class="c2">${fmt(it[1])}</td><td class="c3">${esc(it[2])}</td></tr>`).join('')+
+      `</tbody></table></div>`;
+  });
+  document.getElementById('reftables').innerHTML = html || `<p style="color:var(--dim);font-family:var(--mono)">no matches.</p>`;
+}
+document.getElementById('refq').addEventListener('input',renderRef);
+document.getElementById('reffilters').addEventListener('click',e=>{
+  if(!e.target.classList.contains('fbtn'))return;
+  document.querySelectorAll('#reffilters .fbtn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active'); renderRef();
+});
+renderRef();
+
+/* ===== quiz engine ===== */
+const QW=document.getElementById('quizwrap');
+let order=[], idx=0, score=0, answered=false, perTopic={}, useShuffle=true;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function quizStart(){
+  QW.innerHTML=`<div class="qstart card"><div class="big">?</div>
+    <h3>${QUIZ.length}-question practice set</h3>
+    <p>Mixed multiple-choice, true/false and fill-in-the-blank - modeled on ws1-ws3 and the review-deck sample questions. Instant feedback and explanations.</p>
+    <div class="qopts"><label class="chk"><input type="checkbox" id="shuf" ${useShuffle?'checked':''}> shuffle questions</label></div>
+    <button class="btn" id="startBtn">Start quiz</button></div>`;
+  document.getElementById('startBtn').onclick=()=>{
+    useShuffle=document.getElementById('shuf').checked;
+    order = useShuffle? shuffle(QUIZ.map((_,i)=>i)) : QUIZ.map((_,i)=>i);
+    idx=0; score=0; perTopic={};
+    renderQ();
+  };
+}
+function renderQ(){
+  answered=false;
+  const q=QUIZ[order[idx]];
+  const pct=Math.round((idx)/QUIZ.length*100);
+  const tyLabel={mc:"multiple choice",tf:"true / false",fill:"fill in the blank"}[q.ty];
+  let answerHtml='';
+  if(q.ty==='mc'){
+    answerHtml=`<div class="ans">`+q.o.map((opt,i)=>`<div class="opt" data-i="${i}"><span class="key">${String.fromCharCode(65+i)}</span><span>${fmt(opt)}</span></div>`).join('')+`</div>`;
+  }else if(q.ty==='tf'){
+    answerHtml=`<div class="ans"><div class="opt" data-i="true"><span class="key">T</span><span>True</span></div><div class="opt" data-i="false"><span class="key">F</span><span>False</span></div></div>`;
+  }else{
+    answerHtml=`<input class="fillin" id="fillInput" placeholder="type your answer..." autocomplete="off" spellcheck="false">`;
+  }
+  QW.innerHTML=`<div class="qprog"><span>Q${idx+1}/${QUIZ.length}</span><div class="qbar"><span style="width:${pct}%"></span></div><span class="qscore">${score} pt</span></div>
+    <div class="qcard"><span class="qtag">${esc(q.t)}</span><span class="qtype">${tyLabel}</span>
+    <p class="qtext">${fmt(q.q)}</p>${answerHtml}
+    <div class="feedback" id="fb"></div>
+    <div class="qnav"><button class="btn ghost" id="skipBtn">Skip</button><button class="btn cyan" id="actBtn">${q.ty==='fill'?'Check':'Submit'}</button></div></div>`;
+  let selected=null;
+  if(q.ty==='mc'||q.ty==='tf'){
+    QW.querySelectorAll('.opt').forEach(op=>op.addEventListener('click',()=>{
+      if(answered)return;
+      QW.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+      op.classList.add('sel'); selected=op.dataset.i;
+    }));
+  }
+  const actBtn=document.getElementById('actBtn'), skipBtn=document.getElementById('skipBtn'), fillInput=document.getElementById('fillInput');
+  if(fillInput){ fillInput.focus(); fillInput.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();actBtn.click();}}); }
+  function lock(){ QW.querySelectorAll('.opt').forEach(o=>o.classList.add('locked')); }
+  function grade(){
+    if(answered){ next(); return; }
+    let correct=false, correctText='';
+    if(q.ty==='mc'){
+      if(selected===null) return flash(skipBtn);
+      const si=+selected; correct = si===q.a;
+      QW.querySelectorAll('.opt').forEach(o=>{const i=+o.dataset.i; if(i===q.a)o.classList.add('correct'); if(i===si&&!correct)o.classList.add('wrong');});
+      correctText = String.fromCharCode(65+q.a)+'. '+q.o[q.a]; lock();
+    }else if(q.ty==='tf'){
+      if(selected===null) return flash(skipBtn);
+      const sv = selected==='true'; correct = sv===q.a;
+      QW.querySelectorAll('.opt').forEach(o=>{const v=o.dataset.i==='true'; if(v===q.a)o.classList.add('correct'); if(v===sv&&!correct)o.classList.add('wrong');});
+      correctText = q.a?'True':'False'; lock();
+    }else{
+      const val=(fillInput.value||'').trim().toLowerCase().replace(/\s+/g,' ');
+      correct = q.a.some(ans=>{const A=ans.toLowerCase().trim(); return val===A || val.replace(/['"]/g,'')===A.replace(/['"]/g,'');});
+      correctText = q.a[0]; fillInput.disabled=true; fillInput.style.borderColor = correct?'var(--green)':'var(--red)';
+    }
+    answered=true;
+    if(!perTopic[q.t]) perTopic[q.t]={c:0,n:0};
+    perTopic[q.t].n++; if(correct){perTopic[q.t].c++; score++;}
+    const fb=document.getElementById('fb');
+    fb.className='feedback show '+(correct?'ok':'no');
+    fb.innerHTML=`<div class="verdict">${correct?'Correct':'Not quite'}</div>${correct?'':`<div style="margin-bottom:6px">Answer: <code>${esc(correctText)}</code></div>`}<div>${fmt(q.e)}</div>`;
+    document.querySelector('.qscore').textContent=score+' pt';
+    actBtn.textContent = idx<QUIZ.length-1?'Next':'See results'; actBtn.classList.remove('cyan');
+  }
+  function next(){ idx++; if(idx>=QUIZ.length) results(); else renderQ(); }
+  actBtn.onclick=grade;
+  skipBtn.onclick=()=>{ if(!answered){perTopic[q.t]=perTopic[q.t]||{c:0,n:0};perTopic[q.t].n++;} next(); };
+}
+function flash(el){ el.style.boxShadow='0 0 0 2px var(--amber)'; setTimeout(()=>{el.style.boxShadow='';},400); }
+function results(){
+  const pctScore=Math.round(score/QUIZ.length*100);
+  const color = pctScore>=80?'var(--green)':pctScore>=60?'var(--amber)':'var(--red)';
+  const msg = pctScore>=80?"Strong - you're in good shape for Wednesday.":pctScore>=60?'Solid base. Review the misses and the cheat sheets.':'Keep going - re-read the cheat sheets and worksheet questions, then retake.';
+  const bd=Object.entries(perTopic).filter(([_,v])=>v.n>0).map(([k,v])=>{
+    const p=Math.round(v.c/v.n*100);
+    return `<div class="bd"><span class="nm">${esc(k)}</span><span class="track"><span style="width:${p}%;background:${p>=70?'var(--green)':p>=40?'var(--amber)':'var(--red)'}"></span></span><span class="pct">${v.c}/${v.n}</span></div>`;
+  }).join('');
+  QW.innerHTML=`<div class="qcard result"><div class="ring" style="color:${color}">${pctScore}%</div>
+    <h3>${score} / ${QUIZ.length} correct</h3><div class="msg">${msg}</div>
+    <div class="breakdown">${bd}</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn" id="againBtn">Retake quiz</button>
+      <button class="btn ghost" id="cheatJump">Review cheat sheets</button></div></div>`;
+  document.getElementById('againBtn').onclick=quizStart;
+  document.getElementById('cheatJump').onclick=()=>switchView('cheat');
+}
+quizStart();
+
+/* ===== GREP LAB ===== */
+const GREP_STEPS=[
+  ["1","One line at a time","grep checks every line on its own. If the pattern is found <b>anywhere</b> in a line, grep prints that <b>whole line</b>.","grep cat foods.txt  prints any line containing 'cat'"],
+  ["2","Substring by default","With no anchors a pattern can match anywhere - `cat` also matches 'con<b>cat</b>enate'. Pin it with `^` (start) and `$` (end).","^cat$  matches only a line that is exactly 'cat'"],
+  ["3","Literal vs special","Most characters match themselves. The metacharacters `. ^ $ * [ ] \\ + ? { } | ( )` have powers - put a `\\` in front to make one literal.","\\.  is a real dot     \\$  is a real dollar sign"],
+  ["4","BRE vs ERE","Plain grep (BRE) treats `+ ? { } | ( )` as ordinary text. `grep -E` (ERE) turns them into operators. Rule of thumb: reach for `grep -E`.","grep -E 'cat|dog'   vs   grep 'cat|dog' (literal bar)"],
+  ["5","A line is a record","In the Yelp data each line is one JSON object, so a line match = a record match. Field order isn't fixed - anchor on the field name.","'\"state\":\"CA\"'  matches that field anywhere in the line"],
+  ["6","The flags you need","`-i` ignore case - `-c` count lines - `-n` line numbers - `-v` invert - `-o` only the match - `-E` extended regex.","grep -ic worth review.json  case-insensitive count"],
+];
+document.getElementById('grepsteps').innerHTML = GREP_STEPS.map(s=>`<div class="stepcard"><span class="n">${s[0]}</span><h4>${fmt(s[1])}</h4><p>${fmt(s[2])}</p><div class="ex">${fmt(s[3])}</div></div>`).join('');
+
+const TOKENS=[
+  [".","Any single character","`.at` matches hat, cat, bat"],
+  ["*","Zero or more of the previous item","`ab*` matches a, ab, abb"],
+  ["+","One or more of the previous (-E)","`ab+` matches ab, abb (not a)"],
+  ["?","Zero or one of the previous (-E)","`colou?r` matches color, colour"],
+  ["^","Anchor: start of the line","`^Error` lines beginning with Error"],
+  ["$","Anchor: end of the line","`done$` lines ending in done"],
+  ["[abc]","Any ONE character listed","`[hc]at` matches hat, cat"],
+  ["[^abc]","Any ONE character NOT listed","`[^0-9]` any non-digit"],
+  ["[a-z]","A range of characters","`[A-Z]` any uppercase letter"],
+  ["[[:digit:]]","POSIX class (must be in brackets)","`a[[:digit:]]b` matches a0b..a9b"],
+  ["{n}","Exactly n of the previous (-E)","`[0-9]{3}` exactly 3 digits"],
+  ["{n,m}","Between n and m (-E)","`a{1,3}` matches a, aa, aaa"],
+  ["a|b","Alternation: a OR b (-E)","`cat|dog` either word"],
+  ["( )","Group items together (-E)","`(ab)+` matches ab, abab"],
+  ["\\","Escape - make the next char literal","`\\.` a real dot, `\\$` a real dollar"],
+];
+document.getElementById('tokentable').innerHTML = `<table class="ref"><tbody>`+TOKENS.map(t=>`<tr><td class="c1">${esc(t[0])}</td><td class="c2">${fmt(t[1])}</td><td class="c3">${esc(t[2])}</td></tr>`).join('')+`</tbody></table>`;
+
+const POSIX={'[:digit:]':'0-9','[:alpha:]':'A-Za-z','[:lower:]':'a-z','[:upper:]':'A-Z','[:alnum:]':'0-9A-Za-z','[:space:]':'\\s','[:blank:]':' \\t','[:xdigit:]':'0-9A-Fa-f'};
+function translatePosix(p){ for(const k in POSIX){ p=p.split(k).join(POSIX[k]); } return p; }
+function breSwap(p){
+  let out='';
+  for(let i=0;i<p.length;i++){
+    const c=p[i];
+    if(c==='\\' && i+1<p.length){ const n=p[i+1]; if('+?{}|()'.indexOf(n)>=0){out+=n;i++;continue;} out+=c+n;i++;continue; }
+    if('+?{}|()'.indexOf(c)>=0){ out+='\\'+c; continue; }
+    out+=c;
+  }
+  return out;
+}
+function buildRe(raw,ere,ci){ let js=raw; if(!ere) js=breSwap(js); js=translatePosix(js); return new RegExp(js,'g'+(ci?'i':'')); }
+function hl(line,re){
+  re.lastIndex=0; let out='',last=0,m;
+  while((m=re.exec(line))!==null){
+    out+=esc(line.slice(last,m.index))+'<mark>'+esc(m[0])+'</mark>';
+    last=m.index+m[0].length;
+    if(m[0]==='') re.lastIndex++;
+    if(re.lastIndex>line.length) break;
+  }
+  return out+esc(line.slice(last));
+}
+const DEFAULT_SAMPLE=['hat','cat','bat','chat','a7b','"city":"Santa Barbara"','"state":"CA"','"state":"NY"','"stars":4.5','"stars":5.0','"stars":3.0','"name":"Pizza Place"','"name":"Corner Cafe"','111,222,333,444','555,666,777,888','aaa,222,bbb,ccc','contact me@x.com','call 408-924-1000'].join('\n');
+const patIn=document.getElementById('patIn'), sampleIn=document.getElementById('sampleIn');
+const tgE=document.getElementById('tgE'),tgI=document.getElementById('tgI'),tgV=document.getElementById('tgV'),tgC=document.getElementById('tgC');
+const gpPrefix=document.getElementById('gpPrefix'),patErr=document.getElementById('patErr'),outLines=document.getElementById('outLines'),outSumm=document.getElementById('outSumm');
+sampleIn.value=DEFAULT_SAMPLE;
+function runTester(){
+  const raw=patIn.value, ere=tgE.checked, ci=tgI.checked, inv=tgV.checked, cnt=tgC.checked;
+  gpPrefix.textContent='grep '+(ere?'-E ':'')+(ci?'-i ':'')+(inv?'-v ':'')+(cnt?'-c ':'')+"'";
+  patErr.textContent='';
+  let re=null, bad=false;
+  if(raw.length){ try{ re=buildRe(raw,ere,ci); }catch(e){ patErr.textContent='invalid regex: '+e.message; bad=true; } }
+  const lines=sampleIn.value.split('\n');
+  let printed=0, rows='';
+  lines.forEach(line=>{
+    let matched;
+    if(bad) matched=false; else if(!re) matched=true; else { re.lastIndex=0; matched=re.test(line); }
+    const show = inv ? !matched : matched;
+    if(show) printed++;
+    const disp = (re && matched && !inv) ? hl(line,re) : esc(line);
+    rows+=`<div class="lrow ${show?'match':''}"><span class="flag">${show?'>':'.'}</span><span class="txt">${disp||'<span style=\"color:var(--dim)\">(empty line)</span>'}</span></div>`;
+  });
+  outLines.innerHTML=rows;
+  if(bad){ outSumm.innerHTML='<span style="color:var(--red)">fix the pattern to see matches</span>'; return; }
+  if(cnt) outSumm.innerHTML=`grep -c prints just the number: <b>${printed}</b>`;
+  else outSumm.innerHTML=`grep would print <b>${printed}</b> of ${lines.length} lines${inv?' (inverted)':''}.`;
+}
+[patIn,sampleIn].forEach(el=>el.addEventListener('input',runTester));
+[tgE,tgI,tgV,tgC].forEach(el=>el.addEventListener('change',runTester));
+patIn.value='^[hc]at'; runTester();
+
+const DRILLS=[
+  {pat:"[hc]at", ere:true, lines:["hat","cat","bat","rat","chat"], correct:[0,1,4],
+   why:"`[hc]at` needs an 'h' or 'c' right before 'at'. 'chat' contains the substring 'hat'. 'bat'/'rat' have the wrong letter."},
+  {pat:"^[hc]at$", ere:true, lines:["hat","cat","chat","hat cat","bat"], correct:[0,1],
+   why:"`^...$` anchors BOTH ends, so the line must be EXACTLY 'hat' or 'cat'. 'chat' and 'hat cat' have extra characters."},
+  {pat:"^[^,]+,222,", ere:true, lines:["111,222,333,444","555,666,777,888","aaa,222,bbb,ccc","222,111,000,999"], correct:[0,2],
+   why:"Anchor at the start, consume the first field with `[^,]+`, then require `,222,`. That puts 222 in the SECOND column. In '222,111,...' the 222 is the first column, so it fails."},
+  {pat:"\"stars\":(4\\.5|5\\.0)", ere:true, lines:['"stars":4.5','"stars":5.0','"stars":3.5','"stars":4,5','"stars":45'], correct:[0,1],
+   why:"Alternation `(4\\.5|5\\.0)` matches either rating; `\\.` is a LITERAL dot. '4,5' has a comma and '45' has no dot, so neither matches."},
+];
+document.getElementById('drills').innerHTML=DRILLS.map((d,di)=>`<div class="drill" data-d="${di}">
+  <p class="dq">Which lines does <code>grep ${d.ere?'-E ':''}'${esc(d.pat)}'</code> print?</p>
+  <div class="dlines">${d.lines.map((l,li)=>`<div class="dline" data-l="${li}"><span class="box"></span><span>${esc(l)}</span></div>`).join('')}</div>
+  <button class="fbtn" data-check="${di}">check answer</button>
+  <div class="dfeedback" id="df${di}"></div></div>`).join('');
+document.getElementById('drills').addEventListener('click',e=>{
+  const line=e.target.closest('.dline');
+  if(line){ const d=line.closest('.drill'); if(d.dataset.locked)return; line.classList.toggle('picked'); line.querySelector('.box').textContent=line.classList.contains('picked')?'x':''; return; }
+  const btn=e.target.closest('[data-check]');
+  if(btn){
+    const di=+btn.dataset.check, d=DRILLS[di], block=btn.closest('.drill');
+    block.dataset.locked='1';
+    const picks=[...block.querySelectorAll('.dline')].map(el=>el.classList.contains('picked'));
+    let ok=true;
+    block.querySelectorAll('.dline').forEach((el,i)=>{
+      const should=d.correct.includes(i), did=picks[i];
+      if(should){ el.classList.add('right'); el.querySelector('.box').textContent='x'; if(!did)ok=false; }
+      else if(did){ el.classList.add('miss'); ok=false; }
+    });
+    const fb=block.querySelector('.dfeedback'); fb.className='dfeedback show'; fb.style.color = ok?'var(--green)':'var(--amber)';
+    fb.innerHTML=(ok?'Perfect. ':'Not quite - green = should match, red = should not. ')+'<span style="color:var(--muted)">'+fmt(d.why)+'</span>';
+    btn.style.display='none';
+  }
+});
+
+const MATCH_PAIRS=[
+  ["^","Anchor: start of the line"],["$","Anchor: end of the line"],[".","Any single character"],
+  ["[^b]","Any ONE character except b"],["[[:digit:]]","Any digit 0-9"],["grep -i","Ignore upper/lower case"],
+  ["grep -c","Print a count, not the lines"],["grep -v","Invert: print non-matching lines"],
+];
+let mSel=null, mDone=0;
+function buildMatch(){
+  mSel=null; mDone=0;
+  const left=document.getElementById('mLeft'), right=document.getElementById('mRight');
+  left.innerHTML='<div class="ch">token</div>'; right.innerHTML='<div class="ch">meaning</div>';
+  MATCH_PAIRS.forEach((p,i)=>{ const t=document.createElement('div'); t.className='mitem tok'; t.dataset.i=i; t.textContent=p[0]; left.appendChild(t); });
+  shuffle(MATCH_PAIRS.map((_,i)=>i)).forEach(i=>{ const m=document.createElement('div'); m.className='mitem'; m.dataset.i=i; m.textContent=MATCH_PAIRS[i][1]; right.appendChild(m); });
+  document.getElementById('matchSumm').textContent=`0 / ${MATCH_PAIRS.length} matched`;
+}
+document.getElementById('mLeft').addEventListener('click',e=>{
+  const it=e.target.closest('.mitem'); if(!it||it.classList.contains('done'))return;
+  document.querySelectorAll('#mLeft .mitem').forEach(x=>x.classList.remove('sel')); it.classList.add('sel'); mSel=it;
+});
+document.getElementById('mRight').addEventListener('click',e=>{
+  const it=e.target.closest('.mitem'); if(!it||it.classList.contains('done')||!mSel)return;
+  if(it.dataset.i===mSel.dataset.i){
+    it.classList.add('done'); mSel.classList.add('done'); mSel.classList.remove('sel');
+    it.innerHTML+=' <span class="badge2">ok</span>'; mSel=null; mDone++;
+    const s=document.getElementById('matchSumm'); s.textContent=`${mDone} / ${MATCH_PAIRS.length} matched`;
+    if(mDone===MATCH_PAIRS.length) s.innerHTML=`<b style="color:var(--green)">Solved all ${mDone}!</b>`;
+  } else { it.classList.add('wrongflash'); setTimeout(()=>it.classList.remove('wrongflash'),350); }
+});
+document.getElementById('matchReset').addEventListener('click',buildMatch);
+buildMatch();
+
+/* ===== NAV ===== */
+function switchView(v){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===v));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id===v));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('tabs').addEventListener('click',e=>{ if(e.target.classList.contains('tab')) switchView(e.target.dataset.v); });
+document.getElementById('topiccards').addEventListener('click',e=>{
+  const card=e.target.closest('[data-go]'); if(!card)return;
+  switchView('cheat');
+  const i=TOPICS.findIndex(t=>t.id===card.dataset.go);
+  TOPICS.forEach((_,k)=>toggleAcc(k,k===i));
+  setTimeout(()=>document.querySelectorAll('.topichead')[i].scrollIntoView({behavior:'smooth',block:'center'}),120);
+});
+</script>
+</body>
+</html>

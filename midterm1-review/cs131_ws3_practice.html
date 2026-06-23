@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS 131 — ws3 Interactive Practice</title>
+<style>
+  :root{
+    --bg:#0a0e16;--bg2:#0d1322;--panel:#121a2b;--panel2:#162136;
+    --border:#243049;--border2:#2f3e5e;--text:#dce3f0;--muted:#8a97b2;--dim:#5d6982;
+    --green:#3fd87a;--cyan:#54b9ff;--amber:#f0b53f;--magenta:#d97bff;--red:#ff6b6b;--blue:#6c8cff;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:radial-gradient(1200px 700px at 80% -10%,#14233b 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#101c30 0%,transparent 55%),var(--bg);
+    color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+  code,.mono{font-family:var(--mono)}
+  .wrap{max-width:920px;margin:0 auto;padding:0 18px 80px}
+  header.top{padding:24px 18px 6px;max-width:920px;margin:0 auto}
+  .termbar{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-bottom:none;border-radius:12px 12px 0 0;padding:10px 14px}
+  .dot{width:12px;height:12px;border-radius:50%}.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+  .termpath{margin-left:8px;color:var(--dim);font-family:var(--mono);font-size:13px}
+  .hero{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--border);border-radius:0 0 14px 14px;padding:20px 22px;box-shadow:var(--shadow)}
+  .hero h1{margin:0;font-size:24px}.hero h1 .p{color:var(--cyan);font-family:var(--mono)}
+  .hero .sub{margin:5px 0 0;color:var(--muted);font-size:14px}
+  .progwrap{display:flex;align-items:center;gap:14px;margin-top:16px}
+  .pbar{flex:1;height:10px;background:var(--panel2);border:1px solid var(--border);border-radius:99px;overflow:hidden}
+  .pbar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue));transition:.35s}
+  .pscore{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+  .pscore b{color:var(--cyan)}
+  .resetb{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11.5px;padding:6px 10px;border-radius:8px;cursor:pointer}
+  .resetb:hover{color:var(--text);border-color:var(--red)}
+  nav.tabs{position:sticky;top:0;z-index:40;background:rgba(10,14,22,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);margin-top:16px}
+  .tabsin{max-width:920px;margin:0 auto;display:flex;gap:4px;padding:8px 14px;overflow-x:auto}
+  .tab{border:1px solid transparent;background:transparent;color:var(--muted);font-family:var(--mono);font-size:13px;font-weight:600;padding:8px 14px;border-radius:9px;cursor:pointer;white-space:nowrap}
+  .tab:hover{color:var(--text);background:var(--panel)}
+  .tab.active{color:var(--bg);background:var(--cyan)}
+  h2.part{font-size:18px;margin:26px 0 4px;display:flex;align-items:center;gap:9px}
+  h2.part .h{color:var(--cyan);font-family:var(--mono)}
+  .lead{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+  .grp{font-family:var(--mono);font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin:20px 0 10px;border-bottom:1px solid var(--border);padding-bottom:5px}
+  details.ref{background:var(--panel);border:1px solid var(--border);border-radius:11px;margin:0 0 14px;overflow:hidden}
+  details.ref summary{cursor:pointer;padding:11px 15px;font-size:13.5px;color:var(--cyan);font-family:var(--mono);user-select:none}
+  details.ref summary:hover{background:var(--panel2)}
+  details.ref .body{padding:4px 15px 14px;border-top:1px solid var(--border)}
+  details.ref pre{margin:8px 0 0;background:#0b1120;border:1px solid var(--border);border-radius:8px;padding:11px;overflow-x:auto;font-family:var(--mono);font-size:12px;color:var(--text);line-height:1.5}
+  details.ref pre .c{color:var(--dim)}
+  details.ref p{font-size:13px;color:var(--muted);margin:6px 0 0}
+  .task{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--border);border-radius:13px;padding:14px 16px;margin-bottom:11px;transition:.15s}
+  .task.got{border-color:rgba(63,216,122,.45)}
+  .task.review{border-color:rgba(240,181,63,.4)}
+  .thead{display:flex;align-items:flex-start;gap:11px}
+  .tnum{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;font-weight:800;color:var(--bg);background:var(--cyan);border-radius:6px;padding:3px 7px;min-width:34px;text-align:center}
+  .task.got .tnum{background:var(--green)}.task.review .tnum{background:var(--amber)}
+  .tq{flex:1;font-size:14.5px;line-height:1.5}
+  .tstat{flex:0 0 auto;font-family:var(--mono);font-size:15px;color:var(--dim)}
+  .task.got .tstat{color:var(--green)}.task.review .tstat{color:var(--amber)}
+  .thint{display:none;margin:9px 0 0;background:rgba(84,185,255,.08);border-left:3px solid var(--cyan);padding:7px 11px;border-radius:0 7px 7px 0;font-size:13px;color:var(--text)}
+  .thint.show{display:block}
+  .tinrow{display:flex;align-items:center;gap:0;margin:11px 0 0;background:#0b1120;border:1px solid var(--border2);border-radius:9px;overflow:hidden}
+  .tinrow .dollar{font-family:var(--mono);color:var(--green);padding:0 2px 0 12px;font-size:14px}
+  .tinrow input,.tinrow textarea{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:13.5px;padding:11px 12px;outline:none;resize:vertical}
+  .tinrow textarea{min-height:54px;line-height:1.5}
+  .tinrow:focus-within{border-color:var(--cyan)}
+  .tbtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .b{border:none;cursor:pointer;font-family:var(--mono);font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:9px;transition:.13s}
+  .b.check{background:var(--cyan);color:var(--bg)}
+  .b.reveal{background:transparent;border:1px solid var(--border2);color:var(--text)}
+  .b.hint{background:transparent;border:1px solid var(--border2);color:var(--amber)}
+  .b:hover{filter:brightness(1.08)}
+  .tfb{display:none;margin-top:11px}
+  .tfb.show{display:block;animation:fade .2s}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .verdict{font-family:var(--mono);font-size:13px;font-weight:700;margin-bottom:8px}
+  .verdict.ok{color:var(--green)}.verdict.no{color:var(--amber)}
+  .solbox{background:#0b1120;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-family:var(--mono);font-size:13px;color:var(--green);white-space:pre-wrap;word-break:break-word;line-height:1.6}
+  .solbox .lbl{color:var(--dim);font-size:11px;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+  .exp{font-size:13px;color:var(--muted);margin-top:9px;line-height:1.55}
+  .exp code{background:#0c1322;border:1px solid var(--border);padding:1px 5px;border-radius:5px;color:var(--cyan);font-size:12px}
+  .grade{display:flex;gap:8px;margin-top:11px;align-items:center}
+  .grade .lbl{font-size:12px;color:var(--dim);font-family:var(--mono)}
+  .gb{border:1px solid var(--border2);background:transparent;cursor:pointer;font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:8px}
+  .gb.got{color:var(--green)}.gb.got:hover,.gb.got.sel{background:var(--green);color:var(--bg)}
+  .gb.rev{color:var(--amber)}.gb.rev:hover,.gb.rev.sel{background:var(--amber);color:var(--bg)}
+  footer{max-width:920px;margin:26px auto 0;padding:16px 18px;color:var(--dim);font-size:12px;text-align:center;border-top:1px solid var(--border);font-family:var(--mono)}
+  ::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="termbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="termpath">~/cs131/ws3 — practice</span></div>
+  <div class="hero">
+    <h1><span class="p">$</span> ws3 — Interactive Practice</h1>
+    <p class="sub">I/O redirection &amp; pipelines, file permissions, and background jobs &amp; signals.</p>
+    <div class="progwrap">
+      <div class="pbar"><span id="pfill"></span></div>
+      <span class="pscore"><b id="pgot">0</b> / <span id="ptot">24</span> done</span>
+      <button class="resetb" id="resetB">reset</button>
+    </div>
+  </div>
+</header>
+<nav class="tabs"><div class="tabsin" id="tabs">
+  <button class="tab active" data-go="partA">Part A · redirection &amp; pipes</button>
+  <button class="tab" data-go="partB">Part B · permissions</button>
+  <button class="tab" data-go="partC">Part C · jobs &amp; signals</button>
+</div></nav>
+<div class="wrap">
+  <section id="partA">
+    <h2 class="part"><span class="h">#</span> Part A — I/O Redirection &amp; Pipelines</h2>
+    <p class="lead">Work in <code>~/cs131/ws3</code>. Open the setup to create the sample files, then solve A1–A11.</p>
+    <details class="ref"><summary>▸ setup — create the sample files</summary>
+      <div class="body"><pre>cd ~/cs131
+mkdir -p ws3 &amp;&amp; cd ws3
+touch answers.txt
+printf "banana\napple\ncherry\napple\nbanana\nbanana\ndate\n" &gt; fruits.txt
+printf "ERROR: disk full\nINFO: server started\nERROR: timeout\nINFO: request ok\nWARN: retry\nERROR: null pointer\n" &gt; server.log</pre></div>
+    </details>
+    <div id="listA"></div>
+  </section>
+  <section id="partB" style="display:none">
+    <h2 class="part"><span class="h">#</span> Part B — File Permissions</h2>
+    <p class="lead">Read and set permissions with <code>ls -l</code>, <code>chmod</code>, <code>umask</code>, and <code>find</code>.</p>
+    <details class="ref"><summary>▸ permissions refresher</summary>
+      <div class="body"><pre>-rw-r--r--   type | owner(rw-) | group(r--) | other(r--)
+r=4  w=2  x=1     octal: 640 = rw- r-- ---
+symbolic: u/g/o/a  +/-/=  rwx   e.g. chmod u+rw f
+umask 022 -> new files 644, new dirs 755</pre></div>
+    </details>
+    <div id="listB"></div>
+  </section>
+  <section id="partC" style="display:none">
+    <h2 class="part"><span class="h">#</span> Part C — Background Jobs &amp; Detaching</h2>
+    <p class="lead">Run, suspend, background, kill, and detach a long-running job.</p>
+    <details class="ref"><summary>▸ C1 — create &amp; launch the long-running script</summary>
+      <div class="body"><pre>cat &gt; long.sh &lt;&lt; 'EOF'
+while true; do
+  sleep 2
+  date +"[%T] tick"
+done
+EOF
+
+bash long.sh &gt; log.txt &amp;     <span class="c"># runs in background, prints the PID</span>
+tail log.txt                  <span class="c"># confirm output is accumulating</span></pre></div>
+    </details>
+    <div id="listC"></div>
+  </section>
+</div>
+<footer>cs131 ws3 practice · progress kept for this session (resets on reload) · good luck</footer>
+<script>
+const TASKS=[
+// ----- Part A: redirection & pipes -----
+{id:"A1",part:"A",grp:"Part A — I/O Redirection & Pipelines",type:"multi",q:"Redirect the output of ls -l into a file called listing.txt. Then append the output of date to the same file. Write both commands.",hint:"> overwrites; >> appends",need:["ls -l","listing.txt","date",">>"],sol:"ls -l > listing.txt\ndate >> listing.txt",exp:"~>~ overwrites the file; ~>>~ appends to it without erasing what's there."},
+{id:"A2",part:"A",q:"Run ls /nonexistent_dir and redirect ONLY the error message to errors.txt — nothing should print to the terminal. (Which FD is standard error?)",hint:"standard error is file descriptor 2, so use 2>",cmd:"ls",need:["2>","errors.txt"],sol:"ls /nonexistent_dir 2> errors.txt",exp:"Standard error = file descriptor ~2~. ~2>~ redirects only stderr, so nothing reaches the terminal."},
+{id:"A3",part:"A",q:"Run ls /nonexistent_dir /etc and redirect stdout to output.txt AND stderr to errors.txt at the same time, in a single command.",hint:"> for stdout, 2> for stderr, in one line",cmd:"ls",need:["> output.txt","2> errors.txt"],sol:"ls /nonexistent_dir /etc > output.txt 2> errors.txt",exp:"~>~ sends stdout to output.txt; ~2>~ sends stderr to errors.txt — two separate files at once."},
+{id:"A4",part:"A",q:"Same command as A3, but send both stdout and stderr together into combined.txt using the &> operator.",hint:"&> = both streams to one file",cmd:"ls",need:["&>","combined.txt"],sol:"ls /nonexistent_dir /etc &> combined.txt",exp:"~&>~ redirects BOTH stdout and stderr into a single file."},
+{id:"A5",part:"A",type:"observe",q:"Run ls /nonexistent_dir /etc 2>/dev/null. What do you see on the terminal, and why? What is /dev/null?",sol:"You see ONLY the /etc listing (stdout). The error for /nonexistent_dir is discarded.",exp:"~2>/dev/null~ throws away stderr, so only stdout prints. ~/dev/null~ is the 'bit bucket' — anything written to it is discarded."},
+{id:"A6",part:"A",q:"Use a pipeline with sort and uniq to print the unique fruit names from fruits.txt, one per line, with no duplicates.",hint:"uniq only removes ADJACENT dups — sort first",need:["sort","fruits.txt","uniq"],sol:"sort fruits.txt | uniq",exp:"~uniq~ collapses only adjacent duplicates, so ~sort~ first to group identical lines."},
+{id:"A7",part:"A",q:"Extend A6: print each unique fruit name with a count of how many times it appears, sorted by count descending.",hint:"uniq -c counts; then sort -nr",need:["sort","fruits.txt","uniq -c"],needAny:["sort -nr","sort -rn","-nr","-rn"],sol:"sort fruits.txt | uniq -c | sort -nr",exp:"~uniq -c~ prefixes each line with its count; ~sort -nr~ sorts numerically, descending."},
+{id:"A8",part:"A",q:"Count how many lines in server.log contain ERROR. Print only the number, not the matching lines.",hint:"grep -c (or grep | wc -l)",need:["grep","error","server.log"],needAny:["-c","wc -l"],sol:"grep -c ERROR server.log",exp:"~grep -c~ prints the COUNT of matching lines. (~grep ERROR server.log | wc -l~ also works.)"},
+{id:"A9",part:"A",q:"Extract only the ERROR lines from server.log and save them to errors_only.txt using a single pipeline + redirection.",hint:"grep ERROR ... > file",need:["grep","error","server.log","errors_only.txt",">"],sol:"grep ERROR server.log > errors_only.txt",exp:"~grep~ filters the matching lines and ~>~ saves them into the file."},
+{id:"A10",part:"A",q:"Count the unique log-level prefixes in server.log (ERROR, INFO, WARN): print each prefix and its count, sorted descending by count.",hint:"grep -oE '^[A-Z]+' | sort | uniq -c | sort -nr",need:["grep -oe","server.log","sort","uniq -c"],needAny:["sort -nr","sort -rn","-nr"],sol:"grep -oE '^[A-Z]+' server.log | sort | uniq -c | sort -nr",exp:"~grep -oE '^[A-Z]+'~ prints just the leading word of each line; ~sort | uniq -c~ tallies them; ~sort -nr~ ranks by count."},
+{id:"A11",part:"A",q:"Using /data/yelp/yelp_academic_dataset_business.json, build a pipeline that prints the top 5 most common states (\"state\":\"XX\").",hint:"grep -oE '\"state\":\"[A-Z][A-Z]\"' | sort | uniq -c | sort -nr | head -5",need:["grep","state","sort","uniq -c"],needAny:["head -5","head -n 5"],sol:"grep -oE '\"state\":\"[A-Z][A-Z]\"' /data/yelp/yelp_academic_dataset_business.json | sort | uniq -c | sort -nr | head -5",exp:"Extract the state field with ~grep -oE~, ~sort | uniq -c~ to tally, ~sort -nr~ to rank, ~head -5~ for the top 5."},
+// ----- Part B: permissions -----
+{id:"B1",part:"B",grp:"Part B — File Permissions",cmd:"id",q:"Run id. Record your uid, gid, and all group names. What is the difference between uid and gid?",hint:"just: id",need:["id"],sol:"id",exp:"Output e.g. ~uid=1000(you) gid=1000(you) groups=1000(you),27(sudo)~. ~uid~ = your USER id; ~gid~ = your primary GROUP id. You also belong to supplementary groups listed after 'groups='."},
+{id:"B2",part:"B",cmd:"ls",flags:["l"],q:"Check the permissions of fruits.txt with ls -l. Write the full permission string and break it into owner / group / other.",hint:"ls -l fruits.txt",need:["fruits.txt"],sol:"ls -l fruits.txt",exp:"Output e.g. ~-rw-r--r--~. First char = type (~-~ file). Then three triples: owner ~rw-~, group ~r--~, other ~r--~. r=read, w=write, x=execute."},
+{id:"B3",part:"B",type:"multi",q:"Check the current umask value. What default permissions does it produce for a new file? Create a new file and verify with ls -l.",hint:"umask ; echo hi > new.txt ; ls -l new.txt",need:["umask"],needAny:["ls -l","ls "],sol:"umask                # e.g. 0022\necho hi > new.txt\nls -l new.txt        # -rw-r--r-- (644)",exp:"Files start from base 666; umask ~022~ removes group/other write -> ~644~ (rw-r--r--). (Dirs: 777 - 022 = 755.)"},
+{id:"B4",part:"B",type:"multi",q:"Remove all permissions from secret.txt (chmod 000). Try to cat it — what error appears? Then restore your own read+write using SYMBOLIC notation (not octal). Write both chmod commands.",hint:"chmod 000 secret.txt ; chmod u+rw secret.txt",need:["chmod 000","secret.txt"],needAny:["u+rw","u=rw","u+r","u +rw"],sol:"chmod 000 secret.txt\ncat secret.txt          # -> cat: secret.txt: Permission denied\nchmod u+rw secret.txt",exp:"~chmod 000~ strips all perms; ~cat~ then fails with 'Permission denied'. ~chmod u+rw~ (symbolic: u=owner, +rw add read+write) restores access."},
+{id:"B5",part:"B",q:"Set fruits.txt so the owner can read+write, the group can read only, and others have nothing — using a single chmod with the OCTAL mode. Write the command and the octal value.",hint:"owner rw=6, group r=4, other none=0",need:["chmod 640","fruits.txt"],sol:"chmod 640 fruits.txt",exp:"owner rw = 6, group r = 4, other --- = 0 -> ~640~ (rw-r-----)."},
+{id:"B6",part:"B",q:"Use find to list all regular files under ws3 that are owned by you and have the owner write bit set. Write the find command.",hint:"find ws3 -type f -user $USER -perm -u+w",need:["find","-type f","-user"],needAny:["-perm -u+w","-perm -200","-perm -u=w","-writable"],sol:"find ws3 -type f -user $USER -perm -u+w",exp:"~-type f~ regular files, ~-user $USER~ owned by you, ~-perm -u+w~ owner-write bit is set."},
+// ----- Part C: jobs & signals -----
+{id:"C1",part:"C",grp:"Part C — Background Jobs & Detaching",q:"Launch long.sh in the background, redirecting its output to log.txt. (The shell prints the PID; confirm growth with tail log.txt.)",hint:"end the command with & to background it",need:["long.sh","log.txt",">"],needAny:["&"],sol:"bash long.sh > log.txt &",exp:"~&~ runs the command in the background and the shell prints its PID. Check it with ~tail log.txt~."},
+{id:"C2",part:"C",cmd:"jobs",q:"Run jobs. What three pieces of information does it show for each job?",hint:"just: jobs",need:["jobs"],sol:"jobs",exp:"Output e.g. ~[1]  Running  bash long.sh > log.txt &~. ~jobs~ shows the job NUMBER (e.g. [1]), the STATUS (Running / Stopped), and the COMMAND."},
+{id:"C3",part:"C",type:"observe",q:"Bring the job to the foreground with fg, then suspend it with Ctrl-Z. Run jobs again — what state does it now show?",sol:"fg            # foreground\nCtrl-Z         # suspend\njobs           # -> [1]  Stopped  bash long.sh ...",exp:"After ~Ctrl-Z~ the job is SUSPENDED, so ~jobs~ shows it as 'Stopped'."},
+{id:"C4",part:"C",cmd:"bg",q:"Resume the suspended job in the background using bg. (jobs should then show Running.) Write the bg command.",hint:"bg %1",need:["bg"],needAny:["%1","%"],sol:"bg %1",exp:"~bg %1~ resumes the stopped job, now running in the background — ~jobs~ shows 'Running &'."},
+{id:"C5",part:"C",cmd:"kill",q:"Kill the background job with kill %1. (Confirm with jobs.) What signal does kill send by default when none is specified?",hint:"kill %1",need:["kill"],needAny:["%1","%"],sol:"kill %1",exp:"Default signal is ~SIGTERM~ (15) — a polite 'please terminate'. ~kill -9~ sends ~SIGKILL~ (force)."},
+{id:"C6",part:"C",cmd:"ps",q:"After restarting the job and disowning it, confirm it is still running with ps. Write the ps command you used.",hint:"ps -p <PID>",need:["ps","-p"],sol:"ps -p <PID>",exp:"~disown~ removes the job from the shell's table but the process keeps running; ~ps -p PID~ confirms it's still alive."},
+{id:"C7",part:"C",type:"observe",q:"In one sentence: why does disown let the process survive when the terminal closes, while a regular & background job does not?",sol:"Closing the terminal sends SIGHUP to its jobs (which stops them); disown removes the job from the shell's job table so it no longer receives SIGHUP, so it keeps running.",exp:"A plain ~&~ job still belongs to the shell, so it gets ~SIGHUP~ when the terminal closes. ~disown~ detaches it from the job table, so no SIGHUP reaches it. (~nohup~ achieves the same by ignoring SIGHUP.)"}
+];
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const fmt=s=>esc(s).replace(/~([^~]+)~/g,(m,p)=>'<code>'+p+'</code>');
+const STATUS={};
+const TOTAL=TASKS.length;
+document.getElementById('ptot').textContent=TOTAL;
+
+function checkAnswer(t,raw){
+  const a=raw.trim(); if(!a) return null;
+  const lo=a.toLowerCase();
+  if(t.cmd && !(new RegExp('(^|\\s)'+t.cmd+'(\\s|$)')).test(lo)) return false;
+  if(t.need && !t.need.every(s=>lo.includes(s))) return false;
+  if(t.needAny && !t.needAny.some(s=>lo.includes(s))) return false;
+  if(t.flags){
+    const fl=(a.match(/-[A-Za-z]+/g)||[]).join('');
+    if(!t.flags.every(f=>fl.includes(f))) return false;
+  }
+  return true;
+}
+function cardHTML(t){
+  const obs=t.type==='observe', multi=t.type==='multi';
+  const inField = obs ? '' :
+    '<div class="tinrow"><span class="dollar">$</span>'+
+    (multi?'<textarea data-in placeholder="type your command(s) here..." spellcheck="false"></textarea>'
+          :'<input data-in placeholder="type your command here..." autocomplete="off" spellcheck="false">')+
+    '</div>';
+  const hintBtn=t.hint?'<button class="b hint" data-act="hint">Hint</button>':'';
+  const checkBtn=obs?'':'<button class="b check" data-act="check">Check</button>';
+  const revealBtn='<button class="b reveal" data-act="reveal">'+(obs?'Show answer':'Reveal solution')+'</button>';
+  return '<div class="task" id="task-'+t.id+'" data-id="'+t.id+'">'+
+    '<div class="thead"><span class="tnum">'+t.id+'</span><span class="tq">'+fmt(t.q)+'</span><span class="tstat">○</span></div>'+
+    (t.hint?'<div class="thint">💡 '+fmt(t.hint)+'</div>':'')+inField+
+    '<div class="tbtns">'+checkBtn+revealBtn+hintBtn+'</div>'+
+    '<div class="tfb"></div></div>';
+}
+function feedbackHTML(t,mode){
+  let v='';
+  if(mode==='ok') v='<div class="verdict ok">✓ Looks right — compare with the model answer:</div>';
+  else if(mode==='no') v='<div class="verdict no">Not detected — compare carefully, then grade yourself:</div>';
+  else v='<div class="verdict no" style="color:var(--cyan)">Model solution:</div>';
+  const st=STATUS[t.id]||'todo';
+  return v+'<div class="solbox"><span class="lbl">solution</span>'+esc(t.sol)+'</div>'+
+    '<div class="exp">'+fmt(t.exp)+'</div>'+
+    '<div class="grade"><span class="lbl">your call:</span>'+
+      '<button class="gb got '+(st==='got'?'sel':'')+'" data-grade="got">✓ Got it</button>'+
+      '<button class="gb rev '+(st==='review'?'sel':'')+'" data-grade="review">↻ Review</button></div>';
+}
+function render(){
+  const buckets={A:'',B:'',C:''};
+  TASKS.forEach(t=>{ buckets[t.part]+=(t.grp?'<div class="grp">'+esc(t.grp)+'</div>':'')+cardHTML(t); });
+  document.getElementById('listA').innerHTML=buckets.A;
+  document.getElementById('listB').innerHTML=buckets.B;
+  document.getElementById('listC').innerHTML=buckets.C;
+}
+function updateCard(id){
+  const el=document.getElementById('task-'+id); if(!el) return;
+  const st=STATUS[id]||'todo';
+  el.classList.toggle('got',st==='got'); el.classList.toggle('review',st==='review');
+  el.querySelector('.tstat').textContent = st==='got'?'✓':st==='review'?'↻':'○';
+}
+function setStatus(id,st){ STATUS[id]=st; updateCard(id); updateProgress();
+  const fb=document.querySelector('#task-'+id+' .tfb');
+  if(fb){ fb.querySelectorAll('.gb').forEach(g=>g.classList.toggle('sel', g.dataset.grade===st)); }
+}
+function updateProgress(){
+  const got=Object.values(STATUS).filter(s=>s==='got').length;
+  document.getElementById('pgot').textContent=got;
+  document.getElementById('pfill').style.width=Math.round(got/TOTAL*100)+'%';
+}
+function showFB(id,mode){
+  const t=TASKS.find(x=>x.id===id);
+  const fb=document.querySelector('#task-'+id+' .tfb');
+  fb.innerHTML=feedbackHTML(t,mode); fb.classList.add('show');
+}
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-act]');
+  if(btn){
+    const card=btn.closest('.task'), id=card.dataset.id, t=TASKS.find(x=>x.id===id), act=btn.dataset.act;
+    if(act==='hint'){ card.querySelector('.thint').classList.toggle('show'); return; }
+    if(act==='reveal'){ showFB(id,'reveal'); return; }
+    if(act==='check'){
+      const inp=card.querySelector('[data-in]'); const res=checkAnswer(t,inp?inp.value:'');
+      if(res===null){ inp.focus(); inp.parentElement.style.borderColor='var(--amber)';
+        setTimeout(()=>inp.parentElement.style.borderColor='',500); return; }
+      if(res){ setStatus(id,'got'); showFB(id,'ok'); } else { showFB(id,'no'); }
+      return;
+    }
+  }
+  const gb=e.target.closest('.gb');
+  if(gb){ const id=gb.closest('.task').dataset.id; setStatus(id, gb.dataset.grade); }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && e.target.matches('.tinrow input')){
+    e.preventDefault();
+    const card=e.target.closest('.task'); card.querySelector('[data-act="check"]')?.click();
+  }
+});
+document.getElementById('tabs').addEventListener('click',e=>{
+  const tb=e.target.closest('.tab'); if(!tb) return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===tb));
+  const go=tb.dataset.go;
+  ['partA','partB','partC'].forEach(p=>{ document.getElementById(p).style.display = (p===go)?'':'none'; });
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+document.getElementById('resetB').addEventListener('click',()=>{
+  if(!confirm('Reset all progress and answers?')) return;
+  for(const k in STATUS) delete STATUS[k];
+  render(); updateProgress();
+});
+render(); updateProgress();
+</script>
+</body>
+</html>

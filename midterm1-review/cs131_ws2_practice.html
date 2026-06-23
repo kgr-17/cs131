@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CS 131 — ws2 Interactive Practice (Git)</title>
+<style>
+  :root{
+    --bg:#0a0e16;--bg2:#0d1322;--panel:#121a2b;--panel2:#162136;
+    --border:#243049;--border2:#2f3e5e;--text:#dce3f0;--muted:#8a97b2;--dim:#5d6982;
+    --green:#3fd87a;--cyan:#54b9ff;--amber:#f0b53f;--magenta:#d97bff;--red:#ff6b6b;--blue:#6c8cff;
+    --shadow:0 10px 30px rgba(0,0,0,.45);
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:radial-gradient(1200px 700px at 80% -10%,#16213b 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#2a1420 0%,transparent 55%),var(--bg);
+    color:var(--text);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+  code,.mono{font-family:var(--mono)}
+  .wrap{max-width:920px;margin:0 auto;padding:0 18px 80px}
+  header.top{padding:24px 18px 6px;max-width:920px;margin:0 auto}
+  .termbar{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-bottom:none;border-radius:12px 12px 0 0;padding:10px 14px}
+  .dot{width:12px;height:12px;border-radius:50%}.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+  .termpath{margin-left:8px;color:var(--dim);font-family:var(--mono);font-size:13px}
+  .hero{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--border);border-radius:0 0 14px 14px;padding:20px 22px;box-shadow:var(--shadow)}
+  .hero h1{margin:0;font-size:24px}.hero h1 .p{color:var(--red);font-family:var(--mono)}
+  .hero .sub{margin:5px 0 0;color:var(--muted);font-size:14px}
+  .progwrap{display:flex;align-items:center;gap:14px;margin-top:16px}
+  .pbar{flex:1;height:10px;background:var(--panel2);border:1px solid var(--border);border-radius:99px;overflow:hidden}
+  .pbar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--amber));transition:.35s}
+  .pscore{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap}
+  .pscore b{color:var(--amber)}
+  .resetb{background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--mono);font-size:11.5px;padding:6px 10px;border-radius:8px;cursor:pointer}
+  .resetb:hover{color:var(--text);border-color:var(--red)}
+  nav.tabs{position:sticky;top:0;z-index:40;background:rgba(10,14,22,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);margin-top:16px}
+  .tabsin{max-width:920px;margin:0 auto;display:flex;gap:4px;padding:8px 14px;overflow-x:auto}
+  .tab{border:1px solid transparent;background:transparent;color:var(--muted);font-family:var(--mono);font-size:13px;font-weight:600;padding:8px 14px;border-radius:9px;cursor:pointer;white-space:nowrap}
+  .tab:hover{color:var(--text);background:var(--panel)}
+  .tab.active{color:var(--bg);background:var(--amber)}
+  h2.part{font-size:18px;margin:26px 0 4px;display:flex;align-items:center;gap:9px}
+  h2.part .h{color:var(--amber);font-family:var(--mono)}
+  .lead{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+  .grp{font-family:var(--mono);font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:.8px;font-weight:700;margin:20px 0 10px;border-bottom:1px solid var(--border);padding-bottom:5px}
+  details.ref{background:var(--panel);border:1px solid var(--border);border-radius:11px;margin:0 0 14px;overflow:hidden}
+  details.ref summary{cursor:pointer;padding:11px 15px;font-size:13.5px;color:var(--cyan);font-family:var(--mono);user-select:none}
+  details.ref summary:hover{background:var(--panel2)}
+  details.ref .body{padding:4px 15px 14px;border-top:1px solid var(--border)}
+  details.ref pre{margin:8px 0 0;background:#0b1120;border:1px solid var(--border);border-radius:8px;padding:11px;overflow-x:auto;font-family:var(--mono);font-size:12px;color:var(--text);line-height:1.5}
+  details.ref pre .c{color:var(--dim)}
+  details.ref p{font-size:13px;color:var(--muted);margin:6px 0 0}
+  .task{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--border);border-radius:13px;padding:14px 16px;margin-bottom:11px;transition:.15s}
+  .task.got{border-color:rgba(63,216,122,.45)}
+  .task.review{border-color:rgba(240,181,63,.4)}
+  .thead{display:flex;align-items:flex-start;gap:11px}
+  .tnum{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;font-weight:800;color:var(--bg);background:var(--cyan);border-radius:6px;padding:3px 7px;min-width:30px;text-align:center}
+  .task.got .tnum{background:var(--green)}.task.review .tnum{background:var(--amber)}
+  .tq{flex:1;font-size:14.5px;line-height:1.5}
+  .tstat{flex:0 0 auto;font-family:var(--mono);font-size:15px;color:var(--dim)}
+  .task.got .tstat{color:var(--green)}.task.review .tstat{color:var(--amber)}
+  .thint{display:none;margin:9px 0 0;background:rgba(84,185,255,.08);border-left:3px solid var(--cyan);padding:7px 11px;border-radius:0 7px 7px 0;font-size:13px;color:var(--text)}
+  .thint.show{display:block}
+  .tinrow{display:flex;align-items:center;gap:0;margin:11px 0 0;background:#0b1120;border:1px solid var(--border2);border-radius:9px;overflow:hidden}
+  .tinrow .dollar{font-family:var(--mono);color:var(--green);padding:0 2px 0 12px;font-size:14px}
+  .tinrow input,.tinrow textarea{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:13.5px;padding:11px 12px;outline:none;resize:vertical}
+  .tinrow textarea{min-height:54px;line-height:1.5}
+  .tinrow:focus-within{border-color:var(--cyan)}
+  .tbtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .b{border:none;cursor:pointer;font-family:var(--mono);font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:9px;transition:.13s}
+  .b.check{background:var(--cyan);color:var(--bg)}
+  .b.reveal{background:transparent;border:1px solid var(--border2);color:var(--text)}
+  .b.hint{background:transparent;border:1px solid var(--border2);color:var(--amber)}
+  .b:hover{filter:brightness(1.08)}
+  .tfb{display:none;margin-top:11px}
+  .tfb.show{display:block;animation:fade .2s}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .verdict{font-family:var(--mono);font-size:13px;font-weight:700;margin-bottom:8px}
+  .verdict.ok{color:var(--green)}.verdict.no{color:var(--amber)}
+  .solbox{background:#0b1120;border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-family:var(--mono);font-size:13px;color:var(--green);white-space:pre-wrap;word-break:break-word;line-height:1.6}
+  .solbox .lbl{color:var(--dim);font-size:11px;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px}
+  .exp{font-size:13px;color:var(--muted);margin-top:9px;line-height:1.55}
+  .exp code{background:#0c1322;border:1px solid var(--border);padding:1px 5px;border-radius:5px;color:var(--cyan);font-size:12px}
+  .grade{display:flex;gap:8px;margin-top:11px;align-items:center}
+  .grade .lbl{font-size:12px;color:var(--dim);font-family:var(--mono)}
+  .gb{border:1px solid var(--border2);background:transparent;cursor:pointer;font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:8px}
+  .gb.got{color:var(--green)}.gb.got:hover,.gb.got.sel{background:var(--green);color:var(--bg)}
+  .gb.rev{color:var(--amber)}.gb.rev:hover,.gb.rev.sel{background:var(--amber);color:var(--bg)}
+  footer{max-width:920px;margin:26px auto 0;padding:16px 18px;color:var(--dim);font-size:12px;text-align:center;border-top:1px solid var(--border);font-family:var(--mono)}
+  ::-webkit-scrollbar{height:8px;width:8px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:8px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="termbar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="termpath">~/cs131/ws2 — git practice</span></div>
+  <div class="hero">
+    <h1><span class="p">$</span> ws2 — Interactive Practice (Git)</h1>
+    <p class="sub">The full git workflow: commit, revert, recover from a bad push, branch, diff, merge, resolve conflicts, and fetch.</p>
+    <div class="progwrap">
+      <div class="pbar"><span id="pfill"></span></div>
+      <span class="pscore"><b id="pgot">0</b> / <span id="ptot">16</span> done</span>
+      <button class="resetb" id="resetB">reset</button>
+    </div>
+  </div>
+</header>
+<nav class="tabs"><div class="tabsin" id="tabs">
+  <button class="tab active" data-go="partA">W1–W3 · commit · revert · recover</button>
+  <button class="tab" data-go="partB">W4–W5 · branch · merge · fetch</button>
+</div></nav>
+<div class="wrap">
+  <section id="partA">
+    <h2 class="part"><span class="h">#</span> W1–W3 — Commit, Revert, Recover</h2>
+    <p class="lead">Work in <code>~/cs131/ws2</code>. Open the setup to initialize the worksheet, then solve Q1–Q5.</p>
+    <details class="ref"><summary>▸ W0 — set up (run once)</summary>
+      <div class="body"><pre>cd ~/cs131
+git pull            <span class="c"># sync with GitHub first</span>
+mkdir -p ws2 &amp;&amp; cd ws2
+echo "# CS131 ws2" &gt; notes.md
+touch answers.txt
+git add notes.md
+git commit -m "ws2: initial notes"</pre></div>
+    </details>
+    <div id="listA"></div>
+  </section>
+  <section id="partB" style="display:none">
+    <h2 class="part"><span class="h">#</span> W4–W5 — Branch, Merge, Conflict, Fetch</h2>
+    <p class="lead">Create branches, merge them, resolve a conflict by hand, and fetch from the remote.</p>
+    <details class="ref"><summary>▸ merge conflict markers — reference</summary>
+      <div class="body"><pre>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+Main branch update
+=======
+Branch-specific update
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; conflict-branch</pre>
+      <p>Resolve by editing the file to the content you want, then DELETING all three marker lines. Then <code>git add</code> + <code>git commit</code>.</p></div>
+    </details>
+    <div id="listB"></div>
+  </section>
+</div>
+<footer>cs131 ws2 git practice · progress kept for this session (resets on reload) · good luck</footer>
+<script>
+const TASKS=[
+{id:"Q1",part:"A",grp:"W1 — Commit a change",type:"multi",q:"Add a line to notes.md (e.g. echo \"task: practice git\" >> notes.md), then stage and commit it with the message: ws2: add task line. Write the stage + commit commands.",hint:"git add <file> ; git commit -m \"...\"",need:["git add","git commit","ws2: add task line"],sol:"git add notes.md\ngit commit -m \"ws2: add task line\"",exp:"~git add~ stages the change; ~git commit -m~ records it with the message."},
+{id:"Q2",part:"A",q:"Show the last 3 commits in one-line format to confirm your history. Which command and option give a compact log?",hint:"git log --oneline, limited to 3",need:["git log","--oneline"],needAny:["-3","head -3","-n 3"],sol:"git log --oneline -3",exp:"~git log --oneline~ is the compact one-line log; ~-3~ limits it to the last 3 commits."},
+{id:"Q3",part:"A",grp:"W2 — Revert a bad commit",type:"observe",q:"After making the bad commit, look at the one-line log and copy the SHORT hash of the bad commit.",sol:"git log --oneline\n-> e.g.  a1b2c3d ws2: bad change   (copy the 7-char hash)",exp:"The short hash is the ~7-character id at the start of each ~--oneline~ entry. Copy the one next to 'ws2: bad change'."},
+{id:"Q4",part:"A",q:"Revert the bad commit: create a NEW commit that undoes it, WITHOUT rewriting history. Write the command (then confirm notes.md no longer has the WRONG line).",hint:"git revert <hash>",need:["git revert"],sol:"git revert <hash>",exp:"~git revert~ makes a new commit that reverses the bad one — history is preserved (safe for shared branches). Check with ~cat notes.md~. (~reset~ would rewrite history instead.)"},
+{id:"Q5",part:"A",grp:"W3 — Recover from a failed push (big file)",type:"multi",q:"The push failed (file > 100 MB). Remove the big file from the last commit but keep your other work: (1) untrack it, (2) ignore it, (3) amend the commit, (4) push. Write the full sequence.",hint:"git rm --cached … ; add to .gitignore ; git commit --amend ; git push",need:["git rm --cached","bigdata.bin",".gitignore","--amend","git push"],sol:"git rm --cached bigdata.bin\necho \"bigdata.bin\" >> .gitignore\ngit add .gitignore\ngit commit --amend\ngit push",exp:"~rm --cached~ untracks the file but keeps it on disk; add it to ~.gitignore~; ~commit --amend~ rewrites the last (un-pushed) commit without the big file; then ~push~ succeeds. (Run ~rm bigdata.bin~ afterward to free disk space.)"},
+{id:"Q6",part:"B",grp:"W4 — Branch, diff, merge",q:"Create a new branch named feature-summary and switch to it in a single command. Which command creates-and-switches?",hint:"git switch -c <name>  (or git checkout -b <name>)",needAny:["git switch -c","git checkout -b"],need:["feature-summary"],sol:"git switch -c feature-summary",exp:"~git switch -c name~ (equivalently ~git checkout -b name~) creates AND switches in one step."},
+{id:"Q7",part:"B",type:"multi",q:"On the branch, create summary.md with a couple of lines, then stage and commit it.",hint:"create the file, git add summary.md, git commit -m \"...\"",need:["summary.md","git add","git commit"],sol:"printf \"# Summary\\nfirst line\\n\" > summary.md\ngit add summary.md\ngit commit -m \"ws2: add summary\"",exp:"Create the file, ~git add summary.md~ to stage, then ~git commit -m~ to record it."},
+{id:"Q8",part:"B",q:"Compare the branch against main to see what changed — show the diff of files that differ between the two branches.",hint:"git diff main <branch>",need:["git diff","main"],needAny:["feature-summary","feature"],sol:"git diff main feature-summary",exp:"~git diff branchA branchB~ shows the differences between the two branches."},
+{id:"Q9",part:"B",type:"multi",q:"Switch back to your main branch, then merge feature-summary into it. Write both commands. (summary.md should then exist on main.)",hint:"git switch main ; git merge feature-summary",need:["git merge feature-summary"],needAny:["git switch main","git checkout main","git switch master","git checkout master"],sol:"git switch main\ngit merge feature-summary",exp:"Switch to main, then ~git merge feature-summary~ brings summary.md into main."},
+{id:"Q10",part:"B",q:"Delete the now-merged feature-summary branch. Which option deletes a merged branch?",hint:"git branch -d <name>  (-D force-deletes)",cmd:"git branch",flags:["d"],need:["feature-summary"],sol:"git branch -d feature-summary",exp:"~-d~ deletes a branch that has been merged; ~-D~ force-deletes an unmerged one."},
+{id:"Q11",part:"B",grp:"W4b — Merge conflict",q:"Try to merge conflict-branch into main. Git will stop and report a conflict. Write the merge command (and note which file it reports as conflicted).",hint:"git merge conflict-branch",need:["git merge conflict-branch"],sol:"git merge conflict-branch\n# CONFLICT (content): Merge conflict in summary.md",exp:"Git stops and reports ~summary.md~ as conflicted — both branches changed the same lines."},
+{id:"Q12",part:"B",q:"Run a command to list files in a conflicted (unmerged) state.",hint:"git status shows an 'Unmerged paths' section",needAny:["git status","diff-filter=u"],sol:"git status        (or: git diff --name-only --diff-filter=U)",exp:"~git status~ lists conflicted files under 'Unmerged paths'. ~git diff --name-only --diff-filter=U~ prints just their names."},
+{id:"Q13",part:"B",type:"observe",q:"Open summary.md and resolve the conflict: pick one version, combine them, or write something new — then delete all three marker lines and save.",sol:"Edit summary.md to the final content you want, then DELETE these three lines:\n  <<<<<<< HEAD\n  =======\n  >>>>>>> conflict-branch",exp:"You manually choose the final content and remove ALL conflict markers (~<<<<<<<~, ~=======~, ~>>>>>>>~), then save."},
+{id:"Q14",part:"B",type:"multi",q:"Complete the merge: stage the resolved file and run git commit (Git pre-fills a merge message). Write both commands.",hint:"git add summary.md ; git commit",need:["git add summary.md","git commit"],sol:"git add summary.md\ngit commit",exp:"Staging the resolved file marks the conflict resolved; ~git commit~ finalizes the merge (Git pre-fills the message). Confirm with ~git log --oneline~."},
+{id:"Q15",part:"B",grp:"W5 — Fetch",type:"multi",q:"Run a fetch from origin, then show what the remote has that you don't. Write the fetch command and a command to view incoming commits.",hint:"git fetch origin ; git log HEAD..origin/main --oneline",need:["git fetch"],needAny:["head..origin","origin/main"],sol:"git fetch origin\ngit log HEAD..origin/main --oneline",exp:"~git fetch~ downloads remote commits WITHOUT merging; the range ~HEAD..origin/main~ shows commits the remote has that you don't."},
+{id:"Q16",part:"B",type:"observe",q:"In one sentence, explain the difference between git fetch and git pull.",sol:"git fetch downloads remote changes but does NOT merge them; git pull = git fetch + git merge (it downloads AND merges into your current branch).",exp:"~fetch~ = download only (nothing in your working branch changes). ~pull~ = fetch + merge."}
+];
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const fmt=s=>esc(s).replace(/~([^~]+)~/g,(m,p)=>'<code>'+p+'</code>');
+const STATUS={};
+const TOTAL=TASKS.length;
+document.getElementById('ptot').textContent=TOTAL;
+
+function checkAnswer(t,raw){
+  const a=raw.trim(); if(!a) return null;
+  const lo=a.toLowerCase();
+  if(t.cmd && !(new RegExp('(^|\\s)'+t.cmd+'(\\s|$)')).test(lo)) return false;
+  if(t.need && !t.need.every(s=>lo.includes(s))) return false;
+  if(t.needAny && !t.needAny.some(s=>lo.includes(s))) return false;
+  if(t.flags){
+    const fl=(a.match(/-[A-Za-z]+/g)||[]).join('');
+    if(!t.flags.every(f=>fl.includes(f))) return false;
+  }
+  return true;
+}
+function cardHTML(t){
+  const obs=t.type==='observe', multi=t.type==='multi';
+  const inField = obs ? '' :
+    '<div class="tinrow"><span class="dollar">$</span>'+
+    (multi?'<textarea data-in placeholder="type your command(s) here..." spellcheck="false"></textarea>'
+          :'<input data-in placeholder="type your command here..." autocomplete="off" spellcheck="false">')+
+    '</div>';
+  const hintBtn=t.hint?'<button class="b hint" data-act="hint">Hint</button>':'';
+  const checkBtn=obs?'':'<button class="b check" data-act="check">Check</button>';
+  const revealBtn='<button class="b reveal" data-act="reveal">'+(obs?'Show answer':'Reveal solution')+'</button>';
+  return '<div class="task" id="task-'+t.id+'" data-id="'+t.id+'">'+
+    '<div class="thead"><span class="tnum">'+t.id+'</span><span class="tq">'+fmt(t.q)+'</span><span class="tstat">○</span></div>'+
+    (t.hint?'<div class="thint">💡 '+fmt(t.hint)+'</div>':'')+inField+
+    '<div class="tbtns">'+checkBtn+revealBtn+hintBtn+'</div>'+
+    '<div class="tfb"></div></div>';
+}
+function feedbackHTML(t,mode){
+  let v='';
+  if(mode==='ok') v='<div class="verdict ok">✓ Looks right — compare with the model answer:</div>';
+  else if(mode==='no') v='<div class="verdict no">Not detected — compare carefully, then grade yourself:</div>';
+  else v='<div class="verdict no" style="color:var(--cyan)">Model solution:</div>';
+  const st=STATUS[t.id]||'todo';
+  return v+'<div class="solbox"><span class="lbl">solution</span>'+esc(t.sol)+'</div>'+
+    '<div class="exp">'+fmt(t.exp)+'</div>'+
+    '<div class="grade"><span class="lbl">your call:</span>'+
+      '<button class="gb got '+(st==='got'?'sel':'')+'" data-grade="got">✓ Got it</button>'+
+      '<button class="gb rev '+(st==='review'?'sel':'')+'" data-grade="review">↻ Review</button></div>';
+}
+function render(){
+  let a='',b='';
+  TASKS.forEach(t=>{
+    const block=(t.grp?'<div class="grp">'+esc(t.grp)+'</div>':'')+cardHTML(t);
+    if(t.part==='A') a+=block; else b+=block;
+  });
+  document.getElementById('listA').innerHTML=a;
+  document.getElementById('listB').innerHTML=b;
+}
+function updateCard(id){
+  const el=document.getElementById('task-'+id); if(!el) return;
+  const st=STATUS[id]||'todo';
+  el.classList.toggle('got',st==='got'); el.classList.toggle('review',st==='review');
+  el.querySelector('.tstat').textContent = st==='got'?'✓':st==='review'?'↻':'○';
+}
+function setStatus(id,st){ STATUS[id]=st; updateCard(id); updateProgress();
+  const fb=document.querySelector('#task-'+id+' .tfb');
+  if(fb){ fb.querySelectorAll('.gb').forEach(g=>g.classList.toggle('sel', g.dataset.grade===st)); }
+}
+function updateProgress(){
+  const got=Object.values(STATUS).filter(s=>s==='got').length;
+  document.getElementById('pgot').textContent=got;
+  document.getElementById('pfill').style.width=Math.round(got/TOTAL*100)+'%';
+}
+function showFB(id,mode){
+  const t=TASKS.find(x=>x.id===id);
+  const fb=document.querySelector('#task-'+id+' .tfb');
+  fb.innerHTML=feedbackHTML(t,mode); fb.classList.add('show');
+}
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-act]');
+  if(btn){
+    const card=btn.closest('.task'), id=card.dataset.id, t=TASKS.find(x=>x.id===id), act=btn.dataset.act;
+    if(act==='hint'){ card.querySelector('.thint').classList.toggle('show'); return; }
+    if(act==='reveal'){ showFB(id,'reveal'); return; }
+    if(act==='check'){
+      const inp=card.querySelector('[data-in]'); const res=checkAnswer(t,inp?inp.value:'');
+      if(res===null){ inp.focus(); inp.parentElement.style.borderColor='var(--amber)';
+        setTimeout(()=>inp.parentElement.style.borderColor='',500); return; }
+      if(res){ setStatus(id,'got'); showFB(id,'ok'); } else { showFB(id,'no'); }
+      return;
+    }
+  }
+  const gb=e.target.closest('.gb');
+  if(gb){ const id=gb.closest('.task').dataset.id; setStatus(id, gb.dataset.grade); }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && e.target.matches('.tinrow input')){
+    e.preventDefault();
+    const card=e.target.closest('.task'); card.querySelector('[data-act="check"]')?.click();
+  }
+});
+document.getElementById('tabs').addEventListener('click',e=>{
+  const tb=e.target.closest('.tab'); if(!tb) return;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===tb));
+  const go=tb.dataset.go;
+  document.getElementById('partA').style.display = go==='partA'?'':'none';
+  document.getElementById('partB').style.display = go==='partB'?'':'none';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+document.getElementById('resetB').addEventListener('click',()=>{
+  if(!confirm('Reset all progress and answers?')) return;
+  for(const k in STATUS) delete STATUS[k];
+  render(); updateProgress();
+});
+render(); updateProgress();
+</script>
+</body>
+</html>
